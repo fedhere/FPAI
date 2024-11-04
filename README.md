@@ -61,7 +61,7 @@ Story board
 ## By geopolitica regions?
 
 # Post-processing tasks for removing False Positives
-  - NVDI?
+  - NDVI?
   - Area?
   - Distances?
   - Size?

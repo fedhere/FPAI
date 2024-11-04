@@ -6,6 +6,7 @@ Story board
   - Selection of states
   - Methods used for the census
   - Who made it
+    
   ![Figure 1: Map showing Nigeria and states where census took place](images/census.png)
 
 # Data extraction
@@ -15,6 +16,7 @@ Story board
 
 ## Data manual Labeling
   - Roboflow
+    
 ![Figure 2: Examples annotated images](images/roboflow_annotations.png)
 ![Figure 3: Distribution #ponds per image per state](images/dist_ponds_state.png)
 ![Figure 4: Distribution fish pond sizes](images/dist_ponds_size.png)
@@ -23,6 +25,7 @@ Story board
 ## YOLO Model
   - YOLO models
   - YOLOv7
+    
   ![Figure 5: YOLOv7 architecture](images/yolov7_arch.png)
 ## SAM?
 

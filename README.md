@@ -52,9 +52,9 @@ Story board
 
 ## Ogun state
   - Total images, Split train/test/valid, number epochs
-## Fine tuning Delta state
+## Fine-tuning Delta state
   - Total images, Split train/test/valid, number epochs, fine tune strategie
-## FIne tunning Kwara state
+## Fine-tuning Kwara state
   - Total images, Split train/test/valid, number epochs, fine tune strategie
 ## Trained all
   - Total images, Split train/test/valid, number epochs, fine tune strategie

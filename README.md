@@ -6,7 +6,7 @@ Story board
 
   - Proposal motivation
   - Land cover change, Fish Ponds are replacing what on land?
-  - Food sustainability: Location of ponds + dietary/nutrition information of nearby regions, increase # ponds $$ dietary needs in local population
+  - Food sustainability: Location of ponds + dietary/nutrition information of nearby regions, increase # ponds $\propto$ dietary needs in local population
   - General detection of areas with fish ponds: model trained with one state was able to detect some ponds on other states
 
 # Fish Pond Census

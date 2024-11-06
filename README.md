@@ -72,12 +72,15 @@ Figure 4: Distribution fish pond sizes
 # Results
 
 ![Figure 6: Loss curve per model](images/loss_curve.png)
+Figure 6: Loss curve per model
 
 ![Figure 7:IoU vs score, threshold = 0.5 per state](images/iou_vs_score.png)
 
 ![Figure 8:Precision-recall curve per state](images/precision-recall.png)
 
 ![Figure 9:True area vs Predicted area per state](images/true_predicted_area.png)
+Figure 9:True area vs Predicted area per state
+
 
 # Conclusion
 

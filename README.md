@@ -39,7 +39,9 @@ Figure 4: Distribution fish pond sizes
   - YOLO models
   - YOLOv7
     
-  ![Figure 5: YOLOv7 architecture](images/yolov7_arch.png)
+  ![Figure 5: YOLOv7 architecture](images/yolov7_arch.jpg)
+  Figure 5: YOLOv7 architecture, figure extracted from https://doi.org/10.3389/fpls.2023.1211075 
+  
 ## SAM?
 
 # Methodology

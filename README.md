@@ -26,10 +26,13 @@ Story board
   - Roboflow
     
 ![Figure 2: Examples annotated images](images/roboflow_annotations.png)
+Figure 2: Examples annotated images
 
 ![Figure 3: Distribution #ponds per image per state](images/dist_ponds_state.png)
+Figure 3: Distribution #ponds per image per state
 
 ![Figure 4: Distribution fish pond sizes](images/dist_ponds_size.png)
+Figure 4: Distribution fish pond sizes
 
 # Model Architectures 
 ## YOLO Model

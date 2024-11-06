@@ -20,7 +20,7 @@ Story board
   - How data was extracted (QGIS, Google satellite XYZ Titles)
   - Characteristics of the data (estimation date of data, size)
     - Total images per state
-  - Data not usable for time series analysis
+  - Time analysis limitations of google satellite XYZ titles data
 
 ## Data manual Labeling
   - Roboflow

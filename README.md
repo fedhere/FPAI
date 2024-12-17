@@ -15,12 +15,19 @@ Story board
   - Who made it
     
   ![Figure 1: Map showing Nigeria and states where census took place](images/map_big.png)
+  Figure 1: Nigeria and its 36 geopolitical states. In color are the states considered for this work and where we have information of Fish Ponds location from the WorldFish census.
+
+  ![Figure 2: Fish Pond Location in Ogun State ](images/ogun.png)
+  Figure 2: In bright green the boundary of Ogun state and in light blue the Fish Pond location. The location are later used to extract RGB images containing Fish Ponds.
 
 # Data extraction
   - How data was extracted (QGIS, Google satellite XYZ Titles)
   - Characteristics of the data (estimation date of data, size)
     - Total images per state
   - Time analysis limitations of google satellite XYZ titles data
+
+ ![Figure 3: Methodology data extraction](images/data_extraction.png)
+  Figure 3: Graph showing WorldFish Census -> Fish Ponds location per state -> Construction of Buffer around location -> Extraction of RGB images using: Python + QGIS + XYZ Tiles Google Satellite
 
 ## Data manual Labeling
   - Roboflow

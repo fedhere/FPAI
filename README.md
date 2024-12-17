@@ -56,7 +56,7 @@ Figure 5: Distribution of annotated Fish Pond area in m2 across all the states c
     
 
    ![Figure 6: YOLOv7 architecture](images/yolov7_arch.jpg)
-  Figure 6: YOLOv7 architecture, figure extracted from https://doi.org/10.3389/fpls.2023.1211075 
+  Figure 6: The YOLOv7 model is used as the pre-trained model to fine-tune by using images with annotated FishPonds. Figure extracted from https://doi.org/10.3389/fpls.2023.1211075 
 
   
 ## SAM?

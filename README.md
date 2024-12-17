@@ -14,7 +14,7 @@ Story board
   - Methods used for the census
   - Who made it
     
-  ![Figure 1: Map showing Nigeria and states where census took place](images/census.png)
+  ![Figure 1: Map showing Nigeria and states where census took place](images/map_big.png)
 
 # Data extraction
   - How data was extracted (QGIS, Google satellite XYZ Titles)

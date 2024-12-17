@@ -77,14 +77,6 @@ Figure 5: Distribution of annotated Fish Pond area in m2 across all the states c
   
   Figure 7: Graph showing Methodology -> Extracted RGB images per states -> Roboflow Annotation -> Train/Valid/Test split -> Fine Tune per state the state-of-the-art instance segmentation model, the YOLOv7 -> output: masks -> masks to pixel polygon -> pixel to coordinates
 
-
-
-## Ogun state
-  - Total images, Split train/test/valid, number epochs
-## Fine-tuning Delta state
-  - Total images, Split train/test/valid, number epochs, fine tune strategie
-## Fine-tuning Kwara state
-  - Total images, Split train/test/valid, number epochs, fine tune strategie
 ## Trained all
   - Total images, Split train/test/valid, number epochs, fine tune strategie
 ## By geopolitica regions?

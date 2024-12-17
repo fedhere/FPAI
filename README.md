@@ -18,6 +18,7 @@ Story board
   Figure 1: Nigeria and its 36 geopolitical states. In color are the states considered for this work and where we have information of Fish Ponds location from the WorldFish census.
 
   ![Figure 2: Fish Pond Location in Ogun State ](images/ogun.png)
+  
   Figure 2: In bright green the boundary of Ogun state and in light blue the Fish Pond location. The location are later used to extract RGB images containing Fish Ponds.
 
 # Data extraction

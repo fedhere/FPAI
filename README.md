@@ -35,9 +35,11 @@ Story board
   - Roboflow
     
 ![Figure 3: Examples annotated images](images/roboflow_annotations.png)
+
 Figure 3: Examples annotated images in Ogun State
 
 ![Figure 3a: Total area explored, total area fish ponds](images/total_area_fp.png)
+
 Figure 3a: Total area explored per state in km2 (number of images x pixel size) and the net area in km2 that have annotated fish ponds, in average the fish ponds cover ~9% of all the area explored.
 
 ![Figure 4: Distribution #ponds per image per state](images/dist_ponds_state.png)

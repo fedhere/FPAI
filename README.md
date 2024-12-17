@@ -98,10 +98,10 @@ Figure 8: Test loss curve for each states considered here.
 Figure 9: Precision-Recall curve at different IoU thresholds for SS state. 
 
 ![Figure 9a:True area vs Predicted area per state](images/true_predicted_area.png)
-Figure 9a: True area vs Predicted area for the test data set for all the states considered in the work. 
+Figure 9a: True area vs Predicted area for the test data set for all the states considered in the work. The model is able to predict the Fish Ponds area distribution, including some of the outliers with larger sizes. 
 
 ![Figure 9b: Prediction and True labels colored coded by classification class](images/area_dist_ogun_pred.png)
-Figure 9b: Prediction and True labels colored coded by classification class
+Figure 9b: Prediction and True labels colored coded by classification class. False Positive predictions are embeded within the true area distribution, the model is predicting the correct size but not detecting true Fish Ponds.
 
 
 # Conclusion

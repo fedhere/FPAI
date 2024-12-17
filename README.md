@@ -91,15 +91,17 @@ Figure 4: Distribution of annotated Fish Pond area in m2 across all the states c
 
 # Results
 
-![Figure 6: Loss curve per model](images/loss_curve.png)
-Figure 6: Loss curve per model
+![Figure 8: Loss curve per model](images/loss_curve.png)
+Figure 8: Test loss curve for each states considered here. 
 
-![Figure 7:IoU vs score, threshold = 0.5 per state](images/iou_vs_score.png)
+![Figure 9:Precision-recall curve per state](images/precision-recall.png)
+Figure 9: Precision-Recall curve at different IoU thresholds for SS state. 
 
-![Figure 8:Precision-recall curve per state](images/precision-recall.png)
+![Figure 9a:True area vs Predicted area per state](images/true_predicted_area.png)
+Figure 9a: True area vs Predicted area for the test data set for all the states considered in the work. 
 
-![Figure 9:True area vs Predicted area per state](images/true_predicted_area.png)
-Figure 9:True area vs Predicted area per state
+![Figure 9b: Prediction and True labels colored coded by classification class](images/area_dist_ogun_pred.png)
+Figure 9b: Prediction and True labels colored coded by classification class
 
 
 # Conclusion

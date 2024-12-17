@@ -33,13 +33,13 @@ Story board
 ## Data manual Labeling
   - Roboflow
     
-![Figure 2: Examples annotated images](images/roboflow_annotations.png)
+![Figure 4: Examples annotated images](images/roboflow_annotations.png)
 Figure 2: Examples annotated images in Ogun State
 
-![Figure 3: Distribution #ponds per image per state](images/dist_ponds_state.png)
+![Figure 5: Distribution #ponds per image per state](images/dist_ponds_state.png)
 Figure 3: Distribution number of Fish Ponds per image in all the states considered. There are on average XX amount of annotated Fish Ponds per image; the image with less Fish Ponds has XX and the one with more has XX annotated Fish Ponds. For Ogun states the team annotated 4,951 across X number of images. Delta state 2,981 across Y number of images, other states (maybe a table if we have several states.)
 
-![Figure 4: Distribution fish pond sizes](images/dist_ponds_size.png)
+![Figure 6: Distribution fish pond sizes](images/dist_ponds_size.png)
 Figure 4: Distribution of annotated Fish Pond area in m2 across all the states considered in this work. In average the area of the Fish Pond is XX m2, with some outliers whose size is >5,000m2.
 
 
@@ -48,8 +48,15 @@ Figure 4: Distribution of annotated Fish Pond area in m2 across all the states c
   - YOLO models
   - YOLOv7
     
-  ![Figure 5: YOLOv7 architecture](images/yolov7_arch.jpg)
-  Figure 5: YOLOv7 architecture, figure extracted from https://doi.org/10.3389/fpls.2023.1211075 
+
+  ![Figure 7a: Methodology ](images/metodoly+yolov7arch.png)
+  
+  Figure 7a: Graph showing Methodology -> Extracted RGB images per states -> Roboflow Annotation -> Train/Valid/Test split -> Fine Tune per state the state-of-the-art instance segmentation model, the YOLOv7 
+
+
+   ![Figure 7b: YOLOv7 architecture](images/yolov7_arch.jpg)
+  Figure 7b: YOLOv7 architecture, figure extracted from https://doi.org/10.3389/fpls.2023.1211075 
+
   
 ## SAM?
 

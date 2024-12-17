@@ -49,13 +49,8 @@ Figure 4: Distribution of annotated Fish Pond area in m2 across all the states c
   - YOLOv7
     
 
-  ![Figure 7a: Methodology ](images/metodoly+yolov7arch.png)
-  
-  Figure 7a: Graph showing Methodology -> Extracted RGB images per states -> Roboflow Annotation -> Train/Valid/Test split -> Fine Tune per state the state-of-the-art instance segmentation model, the YOLOv7 
-
-
-   ![Figure 7b: YOLOv7 architecture](images/yolov7_arch.jpg)
-  Figure 7b: YOLOv7 architecture, figure extracted from https://doi.org/10.3389/fpls.2023.1211075 
+   ![Figure 7: YOLOv7 architecture](images/yolov7_arch.jpg)
+  Figure 7: YOLOv7 architecture, figure extracted from https://doi.org/10.3389/fpls.2023.1211075 
 
   
 ## SAM?
@@ -70,6 +65,13 @@ Figure 4: Distribution of annotated Fish Pond area in m2 across all the states c
   - Split train/test/valid
   - IoU, Average Precision
   - TP, FP, FN
+
+    
+ ![Figure 8: Methodology ](images/metodoly.png)
+  
+  Figure 8: Graph showing Methodology -> Extracted RGB images per states -> Roboflow Annotation -> Train/Valid/Test split -> Fine Tune per state the state-of-the-art instance segmentation model, the YOLOv7 -> output: masks -> masks to pixel polygon -> pixel to coordinates
+
+
 
 ## Ogun state
   - Total images, Split train/test/valid, number epochs

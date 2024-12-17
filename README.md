@@ -103,6 +103,11 @@ Figure 8: Test loss curve for each states considered here.
 ![Figure 9:Precision-recall curve per state](images/precision-recall.png)
 Figure 9: Precision-Recall curve at different IoU thresholds for SS state. 
 
+![Figure 9a:Precision-recall results table](images/precision-recall.png)
+Figure 9a: Precision and Recall for the test data set per state. In average the models have a 90% recall and precision.
+
+
+
 ![Figure 9a:True area vs Predicted area per state](images/true_predicted_area.png)
 Figure 9a: True area vs Predicted area for the test data set for all the states considered in the work. The model is able to predict the Fish Ponds area distribution, including some of the outliers with larger sizes. 
 

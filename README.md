@@ -27,6 +27,7 @@ Story board
   - Time analysis limitations of google satellite XYZ titles data
 
  ![Figure 3: Methodology data extraction](images/data_extraction.png)
+
   Figure 3: Graph showing WorldFish Census -> Fish Ponds location per state -> Construction of Buffer around location -> Extraction of RGB images of size 2,000 x 2,000 pixels using: Python + QGIS + XYZ Tiles Google Satellite
 
 ## Data manual Labeling

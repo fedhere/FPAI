@@ -40,7 +40,7 @@ Figure 3: Examples annotated images in Ogun State
 
 ![Figure 3a: Total area explored, total area fish ponds](images/total_area_fp.png)
 
-Figure 3a: Total area explored per state in km2 (number of images x pixel size) and the net area in km2 that have annotated fish ponds, in average the fish ponds cover ~9% of all the area explored.
+Figure 3a: Total area explored per state in km2 (number of images x pixel size) and the net area in km2 that have annotated fish ponds, in average the fish ponds cover ~9% of all the area explored. The areas explored here are targeted areas, given by the WorldFish census, we do not expected 9% of Nigeria being cover by FishPonds.
 
 ![Figure 4: Distribution #ponds per image per state](images/dist_ponds_state.png)
 Figure 4: Distribution number of Fish Ponds per image in all the states considered. There are on average XX amount of annotated Fish Ponds per image; the image with less Fish Ponds has XX and the one with more has XX annotated Fish Ponds. For Ogun states the team annotated 4,951 across X number of images. Delta state 2,981 across Y number of images, other states (maybe a table if we have several states.)

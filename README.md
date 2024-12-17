@@ -34,14 +34,14 @@ Story board
 ## Data manual Labeling
   - Roboflow
     
-![Figure 4: Examples annotated images](images/roboflow_annotations.png)
-Figure 2: Examples annotated images in Ogun State
+![Figure 3: Examples annotated images](images/roboflow_annotations.png)
+Figure 3: Examples annotated images in Ogun State
 
-![Figure 5: Distribution #ponds per image per state](images/dist_ponds_state.png)
-Figure 3: Distribution number of Fish Ponds per image in all the states considered. There are on average XX amount of annotated Fish Ponds per image; the image with less Fish Ponds has XX and the one with more has XX annotated Fish Ponds. For Ogun states the team annotated 4,951 across X number of images. Delta state 2,981 across Y number of images, other states (maybe a table if we have several states.)
+![Figure 4: Distribution #ponds per image per state](images/dist_ponds_state.png)
+Figure 4: Distribution number of Fish Ponds per image in all the states considered. There are on average XX amount of annotated Fish Ponds per image; the image with less Fish Ponds has XX and the one with more has XX annotated Fish Ponds. For Ogun states the team annotated 4,951 across X number of images. Delta state 2,981 across Y number of images, other states (maybe a table if we have several states.)
 
-![Figure 6: Distribution fish pond sizes](images/dist_ponds_size.png)
-Figure 4: Distribution of annotated Fish Pond area in m2 across all the states considered in this work. In average the area of the Fish Pond is XX m2, with some outliers whose size is >5,000m2.
+![Figure 5: Distribution fish pond sizes](images/dist_ponds_size.png)
+Figure 5: Distribution of annotated Fish Pond area in m2 across all the states considered in this work. In average the area of the Fish Pond is XX m2, with some outliers whose size is >5,000m2.
 
 
 # Model Architectures 
@@ -50,8 +50,8 @@ Figure 4: Distribution of annotated Fish Pond area in m2 across all the states c
   - YOLOv7
     
 
-   ![Figure 7: YOLOv7 architecture](images/yolov7_arch.jpg)
-  Figure 7: YOLOv7 architecture, figure extracted from https://doi.org/10.3389/fpls.2023.1211075 
+   ![Figure 6: YOLOv7 architecture](images/yolov7_arch.jpg)
+  Figure 6: YOLOv7 architecture, figure extracted from https://doi.org/10.3389/fpls.2023.1211075 
 
   
 ## SAM?
@@ -68,9 +68,9 @@ Figure 4: Distribution of annotated Fish Pond area in m2 across all the states c
   - TP, FP, FN
 
     
- ![Figure 8: Methodology ](images/metodoly.png)
+ ![Figure 7: Methodology ](images/metodoly.png)
   
-  Figure 8: Graph showing Methodology -> Extracted RGB images per states -> Roboflow Annotation -> Train/Valid/Test split -> Fine Tune per state the state-of-the-art instance segmentation model, the YOLOv7 -> output: masks -> masks to pixel polygon -> pixel to coordinates
+  Figure 7: Graph showing Methodology -> Extracted RGB images per states -> Roboflow Annotation -> Train/Valid/Test split -> Fine Tune per state the state-of-the-art instance segmentation model, the YOLOv7 -> output: masks -> masks to pixel polygon -> pixel to coordinates
 
 
 

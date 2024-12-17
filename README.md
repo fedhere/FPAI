@@ -27,7 +27,7 @@ Story board
     - Total images per state
   - Time analysis limitations of google satellite XYZ titles data
 
- ![Figure 3: Methodology data extraction](images/data_extraction.png)
+ ![Figure 3: Methodology data extraction](images/methodology.png)
 
   Figure 3: Graph showing WorldFish Census -> Fish Ponds location per state -> Construction of Buffer around location -> Extraction of RGB images of size 2,000 x 2,000 pixels using: Python + QGIS + XYZ Tiles Google Satellite
 
@@ -36,6 +36,9 @@ Story board
     
 ![Figure 3: Examples annotated images](images/roboflow_annotations.png)
 Figure 3: Examples annotated images in Ogun State
+
+![Figure 3a: Total area explored, total area fish ponds](images/total_area_fp.png)
+Figure 3a: Total area explored per state in km2 (number of images x pixel size) and the net area in km2 that have annotated fish ponds, in average the fish ponds cover ~9% of all the area explored.
 
 ![Figure 4: Distribution #ponds per image per state](images/dist_ponds_state.png)
 Figure 4: Distribution number of Fish Ponds per image in all the states considered. There are on average XX amount of annotated Fish Ponds per image; the image with less Fish Ponds has XX and the one with more has XX annotated Fish Ponds. For Ogun states the team annotated 4,951 across X number of images. Delta state 2,981 across Y number of images, other states (maybe a table if we have several states.)
@@ -68,7 +71,7 @@ Figure 5: Distribution of annotated Fish Pond area in m2 across all the states c
   - TP, FP, FN
 
     
- ![Figure 7: Methodology ](images/metodoly.png)
+ ![Figure 7: Methodology ](images/methodology.png)
   
   Figure 7: Graph showing Methodology -> Extracted RGB images per states -> Roboflow Annotation -> Train/Valid/Test split -> Fine Tune per state the state-of-the-art instance segmentation model, the YOLOv7 -> output: masks -> masks to pixel polygon -> pixel to coordinates
 

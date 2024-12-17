@@ -27,19 +27,20 @@ Story board
   - Time analysis limitations of google satellite XYZ titles data
 
  ![Figure 3: Methodology data extraction](images/data_extraction.png)
-  Figure 3: Graph showing WorldFish Census -> Fish Ponds location per state -> Construction of Buffer around location -> Extraction of RGB images using: Python + QGIS + XYZ Tiles Google Satellite
+  Figure 3: Graph showing WorldFish Census -> Fish Ponds location per state -> Construction of Buffer around location -> Extraction of RGB images of size 2,000 x 2,000 pixels using: Python + QGIS + XYZ Tiles Google Satellite
 
 ## Data manual Labeling
   - Roboflow
     
 ![Figure 2: Examples annotated images](images/roboflow_annotations.png)
-Figure 2: Examples annotated images
+Figure 2: Examples annotated images in Ogun State
 
 ![Figure 3: Distribution #ponds per image per state](images/dist_ponds_state.png)
-Figure 3: Distribution #ponds per image per state
+Figure 3: Distribution number of Fish Ponds per image in all the states considered. There are on average XX amount of annotated Fish Ponds per image; the image with less Fish Ponds has XX and the one with more has XX annotated Fish Ponds. For Ogun states the team annotated 4,951 across X number of images. Delta state 2,981 across Y number of images, other states (maybe a table if we have several states.)
 
 ![Figure 4: Distribution fish pond sizes](images/dist_ponds_size.png)
-Figure 4: Distribution fish pond sizes
+Figure 4: Distribution of annotated Fish Pond area in m2 across all the states considered in this work. In average the area of the Fish Pond is XX m2, with some outliers whose size is >5,000m2.
+
 
 # Model Architectures 
 ## YOLO Model

@@ -5,8 +5,8 @@
 2. Divide the state by grids of 6km $\times$ 6km
 3. while num_predicitions >= 5000:\
      for every grid:\
-        >divide by grids of 200m $\times$ 200m (2000$\times$2000 pixels), each grid has 900 images of this size\
-        >for every 2000$\times$2000 pixels images:\
+        > divide by grids of 200m $\times$ 200m (2000$\times$2000 pixels), each grid has 900 images of this size\
+        > for every 2000$\times$2000 pixels images:\
            extract the corresponding Google XYZ tiles\
            use the 'fine_tune_ogun_delta_combine_freeze_v2' yolov7 model to predict fishponds in the grid\
            convert mask to polygons\

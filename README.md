@@ -24,6 +24,7 @@
    *  folium=0.19.4
    *  pytorch=2.4.0
    *  rasterio=1.4.3
+     
    The following files include the detail packages
         *  yolov7_qgis_2025_env.yml
         *  yolov7_qgis_2025_explicit.txt

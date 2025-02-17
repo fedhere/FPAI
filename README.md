@@ -37,7 +37,8 @@
   7. Run pipeline by, replace STATE by your desire state, as listed in the shape file of Nigeria(1)
      * sbatch -J STATE pred_all_state_random.sh predict_random_grid.py STATE 5000
        
-     (1)NOTE: States with two or more words should be written without the space, e.g: Cross River should be written as CrossRiver 
+     (1)NOTE: States with two or more words should be written without the space, e.g: Cross River should be written as CrossRiver
+  8. Results would be on `Pipeline/data/STATE/STATE_all_geocoords.*`
 
 # Introduction 
 

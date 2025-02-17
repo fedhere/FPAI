@@ -1,6 +1,40 @@
 # FPAI
 
-Story board
+## What is the pipeline doing?
+1. Select the state
+2. Divide the state by grids of 6km $\times$ 6km
+3. while num_predicitions >= 5000:
+     for every grid:
+        divide by grids of 200m $\times$ 200m (2000$\times$2000 pixels), each grid has 900 images of this size
+        for every 2000$\times$2000 pixels images:
+           extract the corresponding Google XYZ tiles
+           use the 'fine_tune_ogun_delta_combine_freeze_v2' yolov7 model to predict fishponds in the grid
+           convert mask to polygons
+           save shape file of polygons
+           update num_predicitions
+     save shape file of all polygons for grid
+   save shape file for predictions made on state
+
+
+## How to run pipeline?
+1. Requirements:
+   The basis requirememts are:
+   *  qgis=3.40.3
+   *  geopandas=1.0.1
+   *  folium=0.19.4
+   *  pytorch=2.4.0
+   *  rasterio=1.4.3
+   The following files include the detail packages
+        *  yolov7_qgis_2025_env.yml
+        *  yolov7_qgis_2025_explicit.txt
+        *  yolov7_qgis_2025_env_pip.txt
+    
+  2. Git clone https://github.com/taceroc/yolov7/tree/u7_tac_loss_gpu
+  3. Download shape file of Nigeria division by states and save to data/Nigeria
+  4. Download model 'fine_tune_ogun_delta_combine_freeze_v2'
+  5. Run pipeline by, replace STATE by your desire state, as listed in the shape file of Nigeria*
+     * sbatch -J STATE pred_all_state_random.sh predict_random_grid.py STATE 5000
+     *NOTE: States with two or more words should be written without the space, e.g: Cross River should be written as CrossRiver 
 
 # Introduction 
 

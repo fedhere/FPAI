@@ -25,11 +25,10 @@
    *  pytorch=2.4.0
    *  rasterio=1.4.3
      
-   The following files include the detail packages:
-   
-        *  `yolov7_qgis_2025_env.yml`
-        *  `yolov7_qgis_2025_explicit.txt`
-        *  `yolov7_qgis_2025_env_pip.txt`
+   The following files include the detail packages:\
+   `yolov7_qgis_2025_env.yml`
+   `yolov7_qgis_2025_explicit.txt`
+   `yolov7_qgis_2025_env_pip.txt`
     
   3. Git clone https://github.com/taceroc/yolov7/tree/u7_tac_loss_gpu
   4. Download shape file of Nigeria division by states and save to data/Nigeria

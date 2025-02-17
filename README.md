@@ -4,14 +4,14 @@
 1. Select the state
 2. Divide the state by grids of 6km $\times$ 6km
 3. while num_predicitions >= 5000:\
-     for every grid:\
-        &emsp; divide by grids of 200m $\times$ 200m (2000$\times$2000 pixels), each grid has 900 images of this size\
-        &emsp; for every 2000$\times$2000 pixels images:\
-           &emsp; extract the corresponding Google XYZ tiles\
-           &emsp; use the 'fine_tune_ogun_delta_combine_freeze_v2' yolov7 model to predict fishponds in the grid\
-           &emsp; convert mask to polygons\
-           &emsp; save shape file of polygons\
-           &emsp; update num_predicitions\
+     &emsp; for every grid:\
+        &emsp;&emsp; divide by grids of 200m $\times$ 200m (2000$\times$2000 pixels), each grid has 900 images of this size\
+        &emsp;&emsp; for every 2000$\times$2000 pixels images:\
+           &emsp;&emsp;&emsp; extract the corresponding Google XYZ tiles\
+           &emsp;&emsp;&emsp; use the 'fine_tune_ogun_delta_combine_freeze_v2' yolov7 model to predict fishponds in the grid\
+           &emsp;&emsp;&emsp; convert mask to polygons\
+           &emsp;&emsp;&emsp; save shape file of polygons\
+           &emsp;&emsp;&emsp; update num_predicitions\
    &emsp; save shape file of all polygons for grid\
    save shape file for predictions made on state
 

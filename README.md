@@ -5,8 +5,8 @@
 2. Divide the state by grids of 6km $\times$ 6km
 3. while num_predicitions >= 5000:\
      for every grid:\
-        divide by grids of 200m $\times$ 200m (2000$\times$2000 pixels), each grid has 900 images of this size\
-        for every 2000$\times$2000 pixels images:\
+        >divide by grids of 200m $\times$ 200m (2000$\times$2000 pixels), each grid has 900 images of this size\
+        >for every 2000$\times$2000 pixels images:\
            extract the corresponding Google XYZ tiles\
            use the 'fine_tune_ogun_delta_combine_freeze_v2' yolov7 model to predict fishponds in the grid\
            convert mask to polygons\
@@ -33,9 +33,10 @@
   2. Git clone https://github.com/taceroc/yolov7/tree/u7_tac_loss_gpu
   3. Download shape file of Nigeria division by states and save to data/Nigeria
   4. Download model 'fine_tune_ogun_delta_combine_freeze_v2'
-  5. Run pipeline by, replace STATE by your desire state, as listed in the shape file of Nigeria*
+  5. Run pipeline by, replace STATE by your desire state, as listed in the shape file of Nigeria(1)
      * sbatch -J STATE pred_all_state_random.sh predict_random_grid.py STATE 5000
-     *NOTE: States with two or more words should be written without the space, e.g: Cross River should be written as CrossRiver 
+       
+     (1)NOTE: States with two or more words should be written without the space, e.g: Cross River should be written as CrossRiver 
 
 # Introduction 
 

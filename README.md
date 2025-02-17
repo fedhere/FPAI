@@ -25,15 +25,16 @@
    *  pytorch=2.4.0
    *  rasterio=1.4.3
      
-   The following files include the detail packages
+   The following files include the detail packages:
+   
         *  `yolov7_qgis_2025_env.yml`
         *  `yolov7_qgis_2025_explicit.txt`
         *  `yolov7_qgis_2025_env_pip.txt`
     
-  2. Git clone https://github.com/taceroc/yolov7/tree/u7_tac_loss_gpu
-  3. Download shape file of Nigeria division by states and save to data/Nigeria
-  4. Download model 'fine_tune_ogun_delta_combine_freeze_v2'
-  5. Run pipeline by, replace STATE by your desire state, as listed in the shape file of Nigeria(1)
+  3. Git clone https://github.com/taceroc/yolov7/tree/u7_tac_loss_gpu
+  4. Download shape file of Nigeria division by states and save to data/Nigeria
+  5. Download model 'fine_tune_ogun_delta_combine_freeze_v2'
+  6. Run pipeline by, replace STATE by your desire state, as listed in the shape file of Nigeria(1)
      * sbatch -J STATE pred_all_state_random.sh predict_random_grid.py STATE 5000
        
      (1)NOTE: States with two or more words should be written without the space, e.g: Cross River should be written as CrossRiver 

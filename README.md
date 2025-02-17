@@ -32,7 +32,7 @@
     
   3. Git clone https://github.com/taceroc/yolov7/tree/u7_tac_loss_gpu
   4. Download shape file of Nigeria division by states and save to data/Nigeria
-  5. Download model 'fine_tune_ogun_delta_combine_freeze_v2'
+  5. Download model 'fine_tune_ogun_delta_combine_freeze_v2' (feb 17/2025: google drive FishPonds)
   6. cd to Pipeline/
   7. Run pipeline by, replace STATE by your desire state, as listed in the shape file of Nigeria(1)
      * sbatch -J STATE pred_all_state_random.sh predict_random_grid.py STATE 5000

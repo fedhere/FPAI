@@ -5,8 +5,8 @@
 2. Divide the state by grids of 6km $\times$ 6km
 3. while num_predicitions >= 5000:\
      &emsp; for every grid:\
-        &emsp;&emsp; divide by grids of 200m $\times$ 200m (2000$\times$2000 pixels), each grid has 900 images of this size\
-        &emsp;&emsp; for every 2000$\times$2000 pixels images:\
+        &emsp;&emsp; divide by grids of 200m $\times$ 200m (2000 $\times$ 2000 pixels), each grid has 900 images of this size\
+        &emsp;&emsp; for every 2000 $\times$ 2000 pixels images:\
            &emsp;&emsp;&emsp; extract the corresponding Google XYZ tiles\
            &emsp;&emsp;&emsp; use the 'fine_tune_ogun_delta_combine_freeze_v2' yolov7 model to predict fishponds in the grid\
            &emsp;&emsp;&emsp; convert mask to polygons\
@@ -28,7 +28,7 @@
    The following files (in Pipeline/) include the detail packages:\
    `yolov7_qgis_2025_env.yml`\
    `yolov7_qgis_2025_explicit.txt`\
-   `yolov7_qgis_2025_env_pip.txt`\
+   `yolov7_qgis_2025_env_pip.txt`
     
   3. Git clone https://github.com/taceroc/yolov7/tree/u7_tac_loss_gpu
   4. Download shape file of Nigeria division by states and save to data/Nigeria

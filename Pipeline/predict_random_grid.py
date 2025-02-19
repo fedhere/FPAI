@@ -114,25 +114,40 @@ def worker(args):
     
 def generate_table(STATE, GRID_NUMs, num_workers):
     # Number of parallel workers
-
-
-    with mp.Manager() as manager:
-        #signal.signal(signal.SIGUSR1, handler)
-        #signal.signal(signal.SIGTERM, handler)
-        #signal.signal(signal.SIGINT, handler)
-        shared_len = manager.Value('i', 0)  # Shared variable to track length
-        lock = manager.Lock()  # Lock for thread safety
-
-        with mp.Pool(processes=num_workers) as pool:
-            results = []
-            tasks = [(STATE, i, shared_len, lock) for i in grid_random_index]  # Predefine task arguments
-
-            for result in pool.imap_unordered(worker, tasks):
-                if result is None:
-                    print("Breaking", flush=True)
-                    break  # Stop when the target length is reached
-                else:# Stop when the target length is reached
-                    results.append(result)
+    annot = glob.glob(os.path.join(DATA_PATH, f"{STATE}/*/geocoords/*_geocoords.shp"))
+    if len(annot):
+        print(f"Geocoords per grid already exist, creating large shape file")
+        dest = gpd.GeoDataFrame()
+        for an in annot:
+            datas = gpd.read_file(an)
+            dest = pd.concat([dest, datas])
+        dest = dest.reset_index(drop=True)
+        dest.to_file(os.path.join(DATA_PATH, f"{STATE}/{STATE}_all_geocoords.shp"))
+        print(f"Processing complete. Total predictions generated: {results}, {dest.shape} and total pred expected {TOTAL_PRED}")
+    elif len(glob.glob(os.path.join(DATA_PATH, f"{STATE}/*"))) >= 12:
+        print(f"Geocoords shape file per grid doesn't exist, but state already ran once")
+        dest = gpd.GeoDataFrame({'ids':[0], 'geometry': ['nothing here']})
+        dest.to_file(os.path.join(DATA_PATH, f"{STATE}/{STATE}_all_geocoords.shp"))
+        print(f"NO PREDICTIONS, NOTHING TO SAVE")
+        
+    else:
+        with mp.Manager() as manager:
+            #signal.signal(signal.SIGUSR1, handler)
+            #signal.signal(signal.SIGTERM, handler)
+            #signal.signal(signal.SIGINT, handler)
+            shared_len = manager.Value('i', 0)  # Shared variable to track length
+            lock = manager.Lock()  # Lock for thread safety
+    
+            with mp.Pool(processes=num_workers) as pool:
+                results = []
+                tasks = [(STATE, i, shared_len, lock) for i in grid_random_index]  # Predefine task arguments
+    
+                for result in pool.imap_unordered(worker, tasks):
+                    if result is None:
+                        print("Breaking", flush=True)
+                        break  # Stop when the target length is reached
+                    else:# Stop when the target length is reached
+                        results.append(result)
 
         if len(glob.glob(os.path.join(DATA_PATH, f"{STATE}/{STATE}_all_geocoords.shp"))):
             print(f"Processing complete, predictions needed found. Total predictions generated: {results} and total pred expected {TOTAL_PRED}")

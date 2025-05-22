@@ -17,6 +17,7 @@ import logging
 import time
 # import signal
 import subprocess
+import shutil
 
 
 # def handler(signum, frame):
@@ -43,7 +44,7 @@ pred_files = parser.add_argument_group()
 
 pred_files.add_argument(
     'STATE',#make list of the 37 nigeria states
-    choices = ['Abia', 'Adamawa', 'AkwaIbom', 'Bauchi', 'Bayelsa', 'Benue', 'Borno', 'CrossRiver', 'Ebonyi', 'Edo', 'Ekiti',
+    choices = ['Anambra', 'Rivers', 'Abia', 'Adamawa', 'AkwaIbom', 'Bauchi', 'Bayelsa', 'Benue', 'Borno', 'CrossRiver', 'Ebonyi', 'Edo', 'Ekiti',
               'Enugu', 'FederalCapitalTerritory', 'Gombe', 'Imo', 'Jigawa', 'Kaduna', 'Katsina', 'Kebbi', 'Kogi', 'Nasarawa',
               'Ondo', 'Osun', 'Plateau', 'Sokoto', 'Taraba', 'Yobe', 'Zamfara'],
     metavar='state',
@@ -63,17 +64,29 @@ pred_files.add_argument(
     type=int)
 
 
+pred_files.add_argument(
+    '--continue_grid_search',
+    dest='continue_grid_search',
+    help='True flag if continue with grid search',
+    default=False,
+    action=argparse.BooleanOptionalAction)
+
+
+
 ins = parser.parse_args()
 
 STATE = ins.STATE
 # GRID_NUM = ins.GRID_NUM
 TOTAL_PRED = ins.TOTAL_PRED
 
-DATA_PATH = '/lustre/davis/FishPonds_project/share/data/'
+DATA_PATH = '/lustre/davis/FishPonds_project/share/data'
 
-
-if not os.path.exists(os.path.join(DATA_PATH, f"{STATE}")):
-    os.makedirs(os.path.join(DATA_PATH, f"{STATE}"))
+if os.access(os.path.join(DATA_PATH, f"{STATE}"), os.W_OK):
+    state_name = STATE
+else:
+    state_name = STATE+'_2'
+if not os.path.exists(os.path.join(DATA_PATH, f"{state_name}")):
+    os.makedirs(os.path.join(DATA_PATH, f"{state_name}"))
 
 
 grid = create_grid.create_grid(DATA_PATH, STATE, load=True)
@@ -94,82 +107,104 @@ def work(STATE, GRID_NUM, shared_len, lock):
     command = ['python', 'extract_raster_xyz_google_noqgis_single.py', f'{STATE}', f'{GRID_NUM}', 'runs']
     subprocess.call(command)
     with lock:
-        if len(glob.glob(os.path.join(DATA_PATH, f"{STATE}/{GRID_NUM}/geocoords/*_geocoords.shp"))):
-            shape_predictions = gpd.read_file(glob.glob(os.path.join(DATA_PATH, f"{STATE}/{GRID_NUM}/geocoords/*_geocoords.shp"))[0])
+        if os.access(os.path.join(DATA_PATH, f"{STATE}"), os.W_OK):
+            state_name = STATE
+        else:
+            state_name = STATE+'_2'
+        if len(glob.glob(os.path.join(DATA_PATH, f"{state_name}/{GRID_NUM}/geocoords/*_geocoords.shp"))):
+            shape_predictions = gpd.read_file(glob.glob(os.path.join(DATA_PATH, f"{state_name}/{GRID_NUM}/geocoords/*_geocoords.shp"))[0])
             shared_len.value += len(shape_predictions)
             if shared_len.value >= TOTAL_PRED:
-                annot =  glob.glob(os.path.join(DATA_PATH, f"{STATE}/*/geocoords/*_geocoords.shp"))
+                annot =  glob.glob(os.path.join(DATA_PATH, f"{state_name}/*/geocoords/*_geocoords.shp"))
                 dest = gpd.GeoDataFrame()
                 for shape_file in annot:
                     pred_grid = gpd.read_file(shape_file)
                     dest = pd.concat([dest, pred_grid])
                 dest = dest.reset_index(drop=True)
-                dest.to_file(os.path.join(DATA_PATH, f"{STATE}/{STATE}_all_geocoords.shp"))
+                dest.to_file(os.path.join(DATA_PATH, f"{state_name}/{STATE}_all_geocoords.shp"))
                 return None  # Stop processing if target is reached
+            
         return shared_len.value
 
 def worker(args):
     """Unpacks arguments for multiprocessing."""
     return work(*args)
+
+
+def func_manager(STATE, grid_random_index, num_workers):
+    with mp.Manager() as manager:
+        #signal.signal(signal.SIGUSR1, handler)
+        #signal.signal(signal.SIGTERM, handler)
+        #signal.signal(signal.SIGINT, handler)
+        shared_len = manager.Value('i', 0)  # Shared variable to track length
+        lock = manager.Lock()  # Lock for thread safety
+    
+        with mp.Pool(processes=num_workers) as pool:
+            results = []
+            tasks = [(STATE, i, shared_len, lock) for i in grid_random_index]  # Predefine task arguments
+    
+            for result in pool.imap_unordered(worker, tasks):
+                if result is None:
+                    print("Breaking", flush=True)
+                    break  # Stop when the target length is reached
+                else:# Stop when the target length is reached
+                    results.append(result)
+
+    if os.access(os.path.join(DATA_PATH, f"{STATE}"), os.W_OK):
+        state_name = STATE
+    else:
+        state_name = STATE+'_2'
+    if len(glob.glob(os.path.join(DATA_PATH, f"{state_name}/{STATE}_all_geocoords.shp"))):
+        print(f"Processing complete, predictions needed found. Total predictions generated: {results} and total pred expected {TOTAL_PRED}")
+    else:
+        annot = glob.glob(os.path.join(DATA_PATH, f"{state_name}/*/geocoords/*_geocoords.shp"))
+        if len(annot):
+            dest = gpd.GeoDataFrame()
+            for an in annot:
+                datas = gpd.read_file(an)
+                dest = pd.concat([dest, datas])
+            dest = dest.reset_index(drop=True)
+            dest.to_file(os.path.join(DATA_PATH, f"{state_name}/{STATE}_all_geocoords.shp"))
+            print(f"Processing complete. Total predictions generated: {results}, {dest.shape} and total pred expected {TOTAL_PRED}")
+        else:
+            dest = gpd.GeoDataFrame({'ids':[0], 'geometry': ['nothing here']})
+            dest.to_file(os.path.join(DATA_PATH, f"{state_name}/{STATE}_all_geocoords.shp"))
+            print(f"NO PREDICTIONS, NOTHING TO SAVE")
+    
     
 def generate_table(STATE, GRID_NUMs, num_workers):
     # Number of parallel workers
-    annot = glob.glob(os.path.join(DATA_PATH, f"{STATE}/*/geocoords/*_geocoords.shp"))
-    if len(annot):
-        print(f"Geocoords per grid already exist, creating large shape file")
-        dest = gpd.GeoDataFrame()
-        for an in annot:
-            datas = gpd.read_file(an)
-            dest = pd.concat([dest, datas])
-        dest = dest.reset_index(drop=True)
-        dest.to_file(os.path.join(DATA_PATH, f"{STATE}/{STATE}_all_geocoords.shp"))
-        print(f"Processing complete. Total predictions generated: {results}, {dest.shape} and total pred expected {TOTAL_PRED}")
-    elif len(glob.glob(os.path.join(DATA_PATH, f"{STATE}/*"))) >= 12:
-        print(f"Geocoords shape file per grid doesn't exist, but state already ran once")
-        dest = gpd.GeoDataFrame({'ids':[0], 'geometry': ['nothing here']})
-        dest.to_file(os.path.join(DATA_PATH, f"{STATE}/{STATE}_all_geocoords.shp"))
-        print(f"NO PREDICTIONS, NOTHING TO SAVE")
-        
-    else:
-        with mp.Manager() as manager:
-            #signal.signal(signal.SIGUSR1, handler)
-            #signal.signal(signal.SIGTERM, handler)
-            #signal.signal(signal.SIGINT, handler)
-            shared_len = manager.Value('i', 0)  # Shared variable to track length
-            lock = manager.Lock()  # Lock for thread safety
-    
-            with mp.Pool(processes=num_workers) as pool:
-                results = []
-                tasks = [(STATE, i, shared_len, lock) for i in grid_random_index]  # Predefine task arguments
-    
-                for result in pool.imap_unordered(worker, tasks):
-                    if result is None:
-                        print("Breaking", flush=True)
-                        break  # Stop when the target length is reached
-                    else:# Stop when the target length is reached
-                        results.append(result)
-
-        if len(glob.glob(os.path.join(DATA_PATH, f"{STATE}/{STATE}_all_geocoords.shp"))):
-            print(f"Processing complete, predictions needed found. Total predictions generated: {results} and total pred expected {TOTAL_PRED}")
+    if ins.continue_grid_search == False:
+        annot = glob.glob(os.path.join(DATA_PATH, f"{STATE}/*/geocoords/*_geocoords.shp"))
+        if len(annot):
+            print(f"Geocoords per grid already exist, creating large shape file")
+            dest = gpd.GeoDataFrame()
+            for an in annot:
+                datas = gpd.read_file(an)
+                dest = pd.concat([dest, datas])
+            dest = dest.reset_index(drop=True)
+            dest.to_file(os.path.join(DATA_PATH, f"{STATE}/{STATE}_all_geocoords.shp"))
+            print(f"Processing complete. Total predictions generated: {results}, {dest.shape} and total pred expected {TOTAL_PRED}")
+        elif len(glob.glob(os.path.join(DATA_PATH, f"{STATE}/*"))) >= 17:
+            print(f"Geocoords shape file per grid doesn't exist, but state already ran once")
+            dest = gpd.GeoDataFrame({'ids':[0], 'geometry': ['nothing here']})
+            dest.to_file(os.path.join(DATA_PATH, f"{STATE}/{STATE}_all_geocoords.shp"))
+            print(f"NO PREDICTIONS, NOTHING TO SAVE")
         else:
-            annot = glob.glob(os.path.join(DATA_PATH, f"{STATE}/*/geocoords/*_geocoords.shp"))
-            if len(annot):
-                dest = gpd.GeoDataFrame()
-                for an in annot:
-                    datas = gpd.read_file(an)
-                    dest = pd.concat([dest, datas])
-                dest = dest.reset_index(drop=True)
-                dest.to_file(os.path.join(DATA_PATH, f"{STATE}/{STATE}_all_geocoords.shp"))
-                print(f"Processing complete. Total predictions generated: {results}, {dest.shape} and total pred expected {TOTAL_PRED}")
-            else:
-                dest = gpd.GeoDataFrame({'ids':[0], 'geometry': ['nothing here']})
-                dest.to_file(os.path.join(DATA_PATH, f"{STATE}/{STATE}_all_geocoords.shp"))
-                print(f"NO PREDICTIONS, NOTHING TO SAVE")
-
-        # print(f"Processing complete, predictions needed Total predictions generated: {results} and total pred expected {TOTAL_PRED}")
-
-
+            # try:
+            #     print("Deleting old data")
+            #     # command_rmstate = ['rm', '-r', f'/lustre/davis/FishPonds_project/share/data/{STATE}']
+            #     # subprocess.call(command_rmstate)
+            #     for rruns in glob.glob(f'/lustre/davis/FishPonds_project/share/runs/test_all_{STATE}*'):
+            #         shutil.rmtree(rruns)
+            # except:
+            #     print('Nothing to delete')
+            func_manager(STATE, grid_random_index, num_workers)
     
+    else:
+        func_manager(STATE, grid_random_index, num_workers)
+                
+
 
     # with mp.Manager() as manager:
     #     pool =  mp.Pool(processes=num_workers)

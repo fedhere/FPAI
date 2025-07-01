@@ -1,6 +1,7 @@
 # import extract_raster_xyz_google_noqgis_single_Copy1
 import create_grid
 import intersect_result
+import create_features_filter_model
 
 import argparse
 from argparse import FileType, ArgumentParser
@@ -108,8 +109,8 @@ grid_state_buffer = grid[grid['area_inter'] >= 200*200*90*3]
 # .index.values
 np.random.seed(434)
 # print(grid)
-grid_random_index = grid_state_buffer.index.values.copy()[:2] #np.arange(len(grid))
-np.random.shuffle(grid_random_index)
+grid_random_index = grid_state_buffer.index.values.copy()[:4] #np.arange(len(grid))
+# np.random.shuffle(grid_random_index)
 
 try:
     with open('/lustre/davis/FishPonds_project/share/data/Nigeria/grids_ran.json', 'r') as json_file:
@@ -146,6 +147,18 @@ def worker(args):
     return work(*args)
 
 
+def process_predictions(DATA_PATH, STATE, path_to_results='', path_to_save=''):
+    print("Inspect overlapping, creating data set")
+    path_to_intersection = intersect_result.intersect_results(DATA_PATH, STATE, path_to_results='', path_to_save='')
+    print("Extract Features")
+    print("Extract RGB")
+    dest_state_intersection = create_features_filter_model.extract_rgb(path_to_intersection)
+    print("Extract indices")
+    dest_state_intersection_wfeatures, state_geometry = create_features_filter_model.extract_indices(dest_state_intersection, STATE)
+    print("Check preds are within polygon")
+    create_features_filter_model.check_preds_within_state(DATA_PATH, STATE, dest_state_intersection_wfeatures, state_geometry)
+
+
 def func_manager(STATE, grid_random_index, num_workers):
     with mp.Manager() as manager:
         shared_len = manager.Value('i', 0)  # Shared variable to track length
@@ -166,8 +179,8 @@ def func_manager(STATE, grid_random_index, num_workers):
     if len(glob.glob(os.path.join(DATA_PATH, f"{STATE}/{STATE}_all_geocoords.shp"))):
         # print(f"Processing complete, predictions needed found. Total predictions generated: {results} and total pred expected {TOTAL_PRED}")
         print(f"Processing complete, predictions needed found. Total predictions generated: {results}")
-        print("Inspect overlapping, creating data set")
-        intersect_result.intersect_results(DATA_PATH, STATE, path_to_results='', path_to_save='')
+        process_predictions(DATA_PATH, STATE, path_to_results='', path_to_save='')
+        
     else:
         annot = glob.glob(os.path.join(DATA_PATH, f"{STATE}/*/geocoords/*_geocoords.shp"))
         if len(annot):
@@ -178,49 +191,67 @@ def func_manager(STATE, grid_random_index, num_workers):
             dest = dest.reset_index(drop=True)
             dest.to_file(os.path.join(DATA_PATH, f"{STATE}/{STATE}_all_geocoords.shp"))
             # print(f"Processing complete. Total predictions generated: {results}, {dest.shape} and total pred expected {TOTAL_PRED}")
-            print(f"Processing complete. Total predictions generated: {results}, {dest.shape}")
+            print(f"Processing complete. Total predictions generated: {results}, {dest.shape}")           
+            process_predictions(DATA_PATH, STATE, path_to_results='', path_to_save='')
             
-            print("Inspect overlapping, creating data set")
-            intersect_result.intersect_results(DATA_PATH, STATE, path_to_results='', path_to_save='')
         else:
             dest = gpd.GeoDataFrame({'ids':[0], 'geometry': ['nothing here']})
             dest.to_file(os.path.join(DATA_PATH, f"{STATE}/{STATE}_all_geocoords.shp"))
             print(f"NO PREDICTIONS, NOTHING TO SAVE")
     
     
-def generate_table(STATE, GRID_NUMs, num_workers):
+def generate_table(STATE, grid_random_index, num_workers):
     # Number of parallel workers
     if ins.continue_grid_search == False:
-        annot = glob.glob(os.path.join(DATA_PATH, f"{STATE}/*/geocoords/*_geocoords.shp"))
-        if len(annot):
-            print(f"Geocoords per grid already exist, creating large shape file")
-            dest = gpd.GeoDataFrame()
-            for an in annot:
-                datas = gpd.read_file(an)
-                dest = pd.concat([dest, datas])
-            dest = dest.reset_index(drop=True)
-            dest.to_file(os.path.join(DATA_PATH, f"{STATE}/{STATE}_all_geocoords.shp"))
-            print(f"Processing complete. Total predictions generated: {results}, {dest.shape} and total pred expected {TOTAL_PRED}")
-            print("Inspect overlapping, creating data set")
-            intersect_result.intersect_results(DATA_PATH, STATE, path_to_results='', path_to_save='')
-        elif len(glob.glob(os.path.join(DATA_PATH, f"{STATE}/*"))) >= 17:
-            print(f"Geocoords shape file per grid doesn't exist, but state already ran once")
-            dest = gpd.GeoDataFrame({'ids':[0], 'geometry': ['nothing here']})
-            dest.to_file(os.path.join(DATA_PATH, f"{STATE}/{STATE}_all_geocoords.shp"))
-            print(f"NO PREDICTIONS, NOTHING TO SAVE")
-        else:
-            # try:
-            #     print("Deleting old data")
-            #     # command_rmstate = ['rm', '-r', f'/lustre/davis/FishPonds_project/share/data/{STATE}']
-            #     # subprocess.call(command_rmstate)
-            #     for rruns in glob.glob(f'/lustre/davis/FishPonds_project/share/runs/test_all_{STATE}*'):
-            #         shutil.rmtree(rruns)
-            # except:
-            #     print('Nothing to delete')
-            func_manager(STATE, grid_random_index, num_workers)
+
+        func_manager(STATE, grid_random_index, num_workers)
+        
+        # annot = glob.glob(os.path.join(DATA_PATH, f"{STATE}/*/geocoords/*_geocoords.shp"))
+        # if len(annot):
+        #     print(f"Geocoords per grid already exist, creating large shape file")
+        #     dest = gpd.GeoDataFrame()
+        #     for an in annot:
+        #         datas = gpd.read_file(an)
+        #         dest = pd.concat([dest, datas])
+        #     dest = dest.reset_index(drop=True)
+        #     dest.to_file(os.path.join(DATA_PATH, f"{STATE}/{STATE}_all_geocoords.shp"))
+        #     print(f"Processing complete. Total predictions generated: {results}, {dest.shape} and total pred expected {TOTAL_PRED}")
+        #     process_predictions(DATA_PATH, STATE, path_to_results='', path_to_save='')
+        # elif len(glob.glob(os.path.join(DATA_PATH, f"{STATE}/*"))) >= 17:
+        #     print(f"Geocoords shape file per grid doesn't exist, but state already ran once")
+        #     dest = gpd.GeoDataFrame({'ids':[0], 'geometry': ['nothing here']})
+        #     dest.to_file(os.path.join(DATA_PATH, f"{STATE}/{STATE}_all_geocoords.shp"))
+        #     print(f"NO PREDICTIONS, NOTHING TO SAVE")
+        # else:
+        #     # try:
+        #     #     print("Deleting old data")
+        #     #     # command_rmstate = ['rm', '-r', f'/lustre/davis/FishPonds_project/share/data/{STATE}']
+        #     #     # subprocess.call(command_rmstate)
+        #     #     for rruns in glob.glob(f'/lustre/davis/FishPonds_project/share/runs/test_all_{STATE}*'):
+        #     #         shutil.rmtree(rruns)
+        #     # except:
+        #     #     print('Nothing to delete')
+        #     func_manager(STATE, grid_random_index, num_workers)
     
     else:
-        func_manager(STATE, grid_random_index, num_workers)
+        annot = glob.glob(os.path.join(DATA_PATH, f"{STATE}/*/geocoords/*_geocoords.shp"))
+        name_shp = [x.split('/')[-1] for x in annot]
+        grids_ran = [int(''.join(filter(str.isdigit, x.split('/')[-1]))) for x in name_shp]
+        grid_random_index_n = [x for x in grid_random_index if x not in grids_ran]
+        # grid_random_index = grid_state_buffer.index.values.copy()[:2]
+        if len(grids_ran) == len(grid_random_index):
+            annot = glob.glob(os.path.join(DATA_PATH, f"{STATE}/*/geocoords/*_geocoords.shp"))
+            if len(annot):
+                dest = gpd.GeoDataFrame()
+                for an in annot:
+                    datas = gpd.read_file(an)
+                    dest = pd.concat([dest, datas])
+                dest = dest.reset_index(drop=True)
+                dest.to_file(os.path.join(DATA_PATH, f"{STATE}/{STATE}_all_geocoords.shp"))
+                print(f"Processing complete. Total predictions generated: {results}, {dest.shape}")           
+                process_predictions(DATA_PATH, STATE, path_to_results='', path_to_save='')
+        else:
+            func_manager(STATE, grid_random_index_n, num_workers)
                 
 def main():
 

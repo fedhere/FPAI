@@ -36,6 +36,9 @@ def intersect_results(DATA_PATH='', STATE='', path_to_results='', path_to_save='
             # print(ss.ids)
             # print(len(ss['geometry'].geoms))
             gdf_file.loc[six,'geometry'] = ss['geometry'].geoms[0]
+            if ss['geometry'].geom_type in ['LineString', 'MultiLineString']:
+                print(ss['ids'])
+                gdf_file.loc[six,'geometry'] = ss['geometry'].buffer(0.0001)
     joined_df = gpd.sjoin(gdf_file, gdf_file, how="left", predicate="intersects").reset_index(drop=True)
     joined_df_r = gpd.sjoin(gdf_file, gdf_file, how="left", predicate="intersects").reset_index(drop=True)
     

@@ -44,14 +44,7 @@
      (1)NOTE: States with two or more words should be written without the space, e.g: Cross River should be written as CrossRiver
   8. Results would be on `Pipeline/data/STATE/STATE_all_geocoords.*`
 
-# Introduction 
-
-  - Proposal motivation
-  - Land cover change, Fish Ponds are replacing what on land?
-  - Food sustainability: Location of ponds + dietary/nutrition information of nearby regions, increase # ponds $\propto$ dietary needs in local population
-  - General detection of areas with fish ponds: model trained with one state was able to detect some ponds on other states
-
-# Fish Pond Census
+# How data was collected?: Fish Pond Census
   - Selection of states
   - Methods used for the census
   - Who made it
@@ -63,26 +56,13 @@
   
   Figure 2: In bright green the boundary of Ogun state and in light blue the Fish Pond location. The location are later used to extract RGB images containing Fish Ponds.
 
-# Data extraction
-  - How data was extracted (QGIS, Google satellite XYZ Titles)
-  - Characteristics of the data (estimation date of data, size)
-    - Total images per state
-  - Time analysis limitations of google satellite XYZ titles data
-
- ![Figure 3: Methodology data extraction](images/methodology.png)
-
-  Figure 3: Graph showing WorldFish Census -> Fish Ponds location per state -> Construction of Buffer around location -> Extraction of RGB images of size 2,000 x 2,000 pixels using: Python + QGIS + XYZ Tiles Google Satellite
-
-## Data manual Labeling
-  - Roboflow
     
 ![Figure 3: Examples annotated images](images/roboflow_annotations.png)
 
-Figure 3: Examples annotated images in Ogun State
 
 ![Figure 3a: Total area explored, total area fish ponds](images/total_area_fp.png)
 
-Figure 3a: Total area explored per state in km2 (number of images x pixel size) and the net area in km2 that have annotated fish ponds, in average the fish ponds cover ~9% of all the area explored. The areas explored here are targeted areas, given by the WorldFish census, we do not expected 9% of Nigeria being cover by FishPonds.
+
 
 ![Figure 4: Distribution #ponds per image per state](images/dist_ponds_state.png)
 Figure 4: Distribution number of Fish Ponds per image in all the states considered. There are on average XX amount of annotated Fish Ponds per image; the image with less Fish Ponds has XX and the one with more has XX annotated Fish Ponds. For Ogun states the team annotated 4,951 across X number of images. Delta state 2,981 across Y number of images, other states (maybe a table if we have several states.)
@@ -91,69 +71,33 @@ Figure 4: Distribution number of Fish Ponds per image in all the states consider
 Figure 5: Distribution of annotated Fish Pond area in m2 across all the states considered in this work. In average the area of the Fish Pond is XX m2, with some outliers whose size is >5,000m2.
 
 
-# Model Architectures 
-## YOLO Model
-  - YOLO models
-  - YOLOv7
-    
+\begin{table}[htbp]
+\caption{Random Forest features}
+  \label{tab:RF_features}
+\begin{minipage}{\columnwidth}
+\centering
+\begin{tabular}{|c|c|c|}
+\hline
+Feature & Description&Origin \\
+\hline
+ave\_r& average of red color for prediction & Google satellite images \\ \hline
+ave\_g&  average of green color for prediction&  " "\\ \hline
+ave\_b&  average of blue color for prediction& " "\\ \hline
+std\_r&  standard deviation of red color for prediction& " "\\ \hline
+std\_g&  standard deviation of green color for prediction& " "\\ \hline
+std\_b&  standard deviation of blue color for prediction& " "\\ \hline
+area& area of the prediction in meters& segmentation model prediction\\ \hline
+length& perimeter of the prediction in meters& " " \\ \hline
+isoperimetric ratio & how round is the prediction, 1 for circle & " "\\ \hline
+NDVI\_{pond\footnote{for the area of the prediction}/state\footnote{for the state where the prediction is located}/1km\footnote{1km$^{2}$ around the prediction}} &  Normalized Difference Vegetation Index& \makecell{Sentinel-2, Level-2A, GEE \footnote{Google Earth Engine. Sentinel data was extracted from the period between November and December 2023.} \\ Python API} \\ \hline
+NDBI\_{pond/state/1km} &  Normalized Difference Built-up Index&" " \\ \hline
+NDWI\_{pond/state/1km} &  Normalized Difference Water Index& " " \\ \hline
+MSAVI\_{pond/state/1km} & Modified Soil Adjusted Vegetation Index&" " \\
+\hline
+\end{tabular}
+\end{minipage}
+\end{table}
 
-   ![Figure 6: YOLOv7 architecture](images/yolov7_arch.jpg)
-  Figure 6: The YOLOv7 model is used as the pre-trained model to fine-tune by using images with annotated FishPonds. Figure extracted from https://doi.org/10.3389/fpls.2023.1211075 
-
-  
-## SAM?
-
-# Methodology
-## Description of models
-  - Model per state
-  - Fine tuning strategies
-
-# Training Details and Metrics
-  - Darwin UDEL, GPU
-  - Split train/test/valid
-  - IoU, Average Precision
-  - TP, FP, FN
-
-    
- ![Figure 7: Methodology ](images/methodology.png)
-  
-  Figure 7: Graph showing Methodology -> Extracted RGB images per states -> Roboflow Annotation -> Train/Valid/Test split -> Fine Tune per state the state-of-the-art instance segmentation model, the YOLOv7 -> output: masks -> masks to pixel polygon -> pixel to coordinates
-
-## Trained all
-  - Total images, Split train/test/valid, number epochs, fine tune strategie
-## By geopolitica regions?
-
-# Post-processing tasks for removing False Positives
-  - NDVI?
-  - Area?
-  - Distances?
-  - Size?
-
-# Results
-
-![Figure 8: Loss curve per model](images/loss_curve.png)
-Figure 8: Test loss curve for each states considered here. 
-
-![Figure 9:Precision-recall curve per state](images/precision-recall.png)
-Figure 9: Precision-Recall curve at different IoU thresholds for SS state. 
-
-![Figure 9a:Precision-recall results table](images/precision-recall.png)
-Figure 9a: Precision and Recall for the test data set per state. In average the models have a 90% recall and precision.
-
-
-![Figure 10a:True area vs Predicted area per state](images/true_predicted_area.png)
-Figure 10a: True area vs Predicted area for the test data set for all the states considered in the work. The model is able to predict the Fish Ponds area distribution, including some of the outliers with larger sizes. 
-
-
-![Figure 10b: Prediction and True labels colored coded by classification class](images/area_dist_ogun_pred.png)
-Figure 10b: Prediction and True labels colored coded by classification class. False Positive predictions are embeded within the true area distribution, the model is predicting the correct size but not detecting true Fish Ponds.
-
-
-![Figure 11: Collage of images in different states showing examples of prediction ](images/ogun_examples(1)(1).png)
-Figure 11: Collage of images in different states showing examples of predictions, and true annotation in red.
-
-
-# Conclusion
 
 
 

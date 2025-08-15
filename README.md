@@ -45,24 +45,19 @@
   8. Results would be on `Pipeline/data/STATE/STATE_all_geocoords.*`
 
 # How data was collected?: Fish Pond Census
-  - Selection of states
-  - Methods used for the census
-  - Who made it
-    
-  ![Figure 1: Map showing Nigeria and states where census took place](images/map_big.png)
+
+  ![Figure: Map showing Nigeria and states where census took place](images/map_big.png)
   Figure 1: Nigeria and its 36 geopolitical states. In color are the states considered for this work and where we have information of Fish Ponds location from the WorldFish census.
 
-  ![Figure 2: Fish Pond Location in Ogun State ](images/ogun.png)
-  
-  Figure 2: In bright green the boundary of Ogun state and in light blue the Fish Pond location. The location are later used to extract RGB images containing Fish Ponds.
 
-    
 ![Figure 3: Examples annotated images](images/roboflow_annotations.png)
 
 
 ![Figure 3a: Total area explored, total area fish ponds](images/total_area_fp.png)
 
 
+![Figure: Map of Nigeria color coded by the # of fish ponds per state](images/map_nigeria.png)
+Figure: Map of Nigeria, the states are color coded by the number of fish ponds in the state used to train the segmentation model. Since more fish ponds were found in Delta and Ogun states, these two states contribute the most to the fish pond data set.
 
 ![Figure 4: Distribution #ponds per image per state](images/dist_ponds_state.png)
 Figure: Distribution number of Fish Ponds per image in all the states considered. There are on average XX amount of annotated Fish Ponds per image; the image with less Fish Ponds has XX and the one with more has XX annotated Fish Ponds. For Ogun states the team annotated 4,951 across X number of images. Delta state 2,981 across Y number of images, other states (maybe a table if we have several states.)

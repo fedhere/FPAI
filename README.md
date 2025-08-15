@@ -37,8 +37,8 @@
   5. Download model 'fine_tune_ogun_delta_combine_freeze_v2' (feb 17/2025: google drive FishPonds)
   6. cd to Pipeline/
   7. Run pipeline by, replace STATE by your desired state, as listed in the shape file of Nigeria(1)
-     * sbatch -J STATE pred_all_state_random.sh predict_random_grid.py STATE
-       If the job ended but not all state was covered, submit this job instead
+     * sbatch -J STATE pred_all_state_random.sh predict_random_grid.py STATE \
+       If the job ended but not all state was covered, submit this job instead \
      * sbatch -J STATE pred_all_state_random.sh predict_random_grid.py STATE --continue_grid_search
        
      (1)NOTE: States with two or more words should be written without the space, e.g: Cross River should be written as CrossRiver

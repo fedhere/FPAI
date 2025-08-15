@@ -75,29 +75,17 @@ Figure: Distribution of annotated Fish Pond area in m2 across all the states con
 |Feature | Description|Origin |
 |-----|-------|------|
 |ave\_r| average of red color for prediction | Google satellite images |
-
 |ave\_g|  average of green color for prediction|  " "|
-
 |ave\_b|  average of blue color for prediction| " "|
-
 |std\_r|  standard deviation of red color for prediction| " "|
-
 |std\_g|  standard deviation of green color for prediction| " "|
-
 |std\_b|  standard deviation of blue color for prediction| " "|
-
 |area| area of the prediction in meters| segmentation model prediction|
-
 |length| perimeter of the prediction in meters| " " |
-
 |isoperimetric ratio | how round is the prediction, 1 for circle | " "|
-
 |NDVI\_pond[^1]/state[^2]/1km[^3] |  Normalized Difference Vegetation Index| Sentinel-2, Level-2A, GEE[^4]/ Python API |
-
 |NDBI\_pond/state/1km |  Normalized Difference Built-up Index|" " |
-
 |NDWI\_pond/state/1km |  Normalized Difference Water Index| " " |
-
 |MSAVI\_pond/state/1km | Modified Soil Adjusted Vegetation Index|" " |
 
 [^1]: for the area of the prediction

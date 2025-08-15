@@ -33,24 +33,39 @@ parser = ArgumentParser()
 pred_files = parser.add_argument_group()
 
 pred_files.add_argument(
-    'STATE',#make list of the 37 nigeria states
+    '--STATE',#make list of the 37 nigeria states
     choices = ['Anambra', 'Rivers', 'Abia', 'Adamawa', 'AkwaIbom', 'Bauchi', 'Bayelsa', 'Benue', 'Borno', 'CrossRiver', 'Ebonyi', 'Edo', 'Ekiti',
               'Enugu', 'FederalCapitalTerritory', 'Gombe', 'Imo', 'Jigawa', 'Kaduna', 'Katsina', 'Kebbi', 'Kogi', 'Nasarawa',
               'Ondo', 'Osun', 'Plateau', 'Sokoto', 'Taraba', 'Yobe', 'Zamfara'],
-    metavar='state',
+    metavar='STATE',
     help='Define state where you want to extract imgs ',
     type=str)
 
 pred_files.add_argument(
-    'GRID_NUM',
-    metavar='grid_num',
+    '--GRID_NUM',
+    metavar='GRID_NUM',
     help='Number of grid you want to extract data, check how many the state has',
     type=int)
 
 pred_files.add_argument(
-    'RUNS',
-    metavar='runs_name',
+    '--RUNS',
+    metavar='RUNS',
     help='Name of run folder',
+    type=str)
+
+pred_files.add_argument(
+    '--ROOT',
+    metavar='ROOT',
+    help='Dir of ROOT folder',
+    default='/lustre/davis/FishPonds_project/share',
+    type=str)
+
+
+pred_files.add_argument(
+    '--ROOT_NIGERIA_DATA',
+    metavar='ROOT_NIGERIA_DATA',
+    help='Root of location of Nigeria grid',
+    default='/lustre/davis/FishPonds_project/share/data/',
     type=str)
 
 ins = parser.parse_args()
@@ -58,7 +73,9 @@ ins = parser.parse_args()
 STATE = ins.STATE
 GRID_NUM = ins.GRID_NUM
 RUNS = ins.RUNS
+ROOT = ins.ROOT
 
+ROOT_NIGERIA_DATA = ins.ROOT_NIGERIA_DATA
 
 print('HERE')
 # cc = 0
@@ -81,7 +98,7 @@ if len(glob.glob(os.path.join(DATA_PATH, f"{STATE}/{GRID_NUM}/geocoords/*_geocoo
 
 
 print('RUNNING')
-create_grid.create_grid('/lustre/davis/FishPonds_project/share/data', STATE, GRID_NUM)
+create_grid.create_grid(ROOT_NIGERIA_DATA, STATE, GRID_NUM)
 
 # Load QGIS to extract Google XYZ Tiles
 os.environ["QT_QPA_PLATFORM"] = "offscreen"
@@ -102,7 +119,7 @@ pipe = QgsRasterPipe()
 pipe.set(provider.clone())
 pipe.set(renderer.clone())
 
-layer = QgsVectorLayer(os.path.join("/lustre/davis/FishPonds_project/share/data", f"{STATE}/grid_{STATE}.shp"))
+layer = QgsVectorLayer(os.path.join(ROOT_NIGERIA_DATA, f"{STATE}/grid_{STATE}.shp"))
 feats = [ feat for feat in layer.getFeatures() ]
 print(f"The {STATE} state is divded into {len(feats)} squares of 6km x 6km")
 # print(f"Extracting 100x100 images each of 2,000x2,000 pixels from {GRID_NUM} grid...")
@@ -156,6 +173,10 @@ sy = width * 0.1 #h / iter_h
 sx = height * 0.1 #w / iter_w
 #print(sy, sx, xmax)
 xmin = xmax - sx
+
+join_path_project = os.path.join(ROOT, RUNS)
+
+
 print(f"EXTRACTING TIF FILES FROM XYZ GOOGLE TILES OF {STATE} AND GRID NUM {GRID_NUM}")
 for i in range(iter_w):
     # ymax = extent_big.yMaximum()
@@ -186,8 +207,8 @@ for i in range(iter_w):
             tif.save(filename_new)
         os.remove(img)
 
-        if os.path.exists(f"/lustre/davis/FishPonds_project/share/{RUNS}/test_all_{STATE}_{GRID_NUM}/{STATE}_g{k}c{i}r{j}"):
-            command = ['rm', '-r', f"/lustre/davis/FishPonds_project/share/{RUNS}/test_all_{STATE}_{GRID_NUM}/{STATE}_g{k}c{i}r{j}"]
+        if os.path.exists(f"{join_path_project}/test_all_{STATE}_{GRID_NUM}/{STATE}_g{k}c{i}r{j}"):
+            command = ['rm', '-r', f"{join_path_project}/test_all_{STATE}_{GRID_NUM}/{STATE}_g{k}c{i}r{j}"]
             subprocess.call(command)
 
         comand = (f"python $WORKDIR/FishPonds_project/share/YOLO/yolov7/seg/segment/predict.py \
@@ -198,7 +219,7 @@ for i in range(iter_w):
         --save-conf \
         --iou-thres 0.5 \
         --conf-thres 0.5 \
-        --project $WORKDIR/FishPonds_project/share/{RUNS}/test_all_{STATE}_{GRID_NUM}/ \
+        --project {join_path_project}/test_all_{STATE}_{GRID_NUM}/ \
         --name {STATE}_g{k}c{i}r{j}")
         os.system(comand)
         os.remove(os.path.join(DATA_PATH, f'{STATE}/{GRID_NUM}/{STATE}_g{k}c{i}r{j}.png'))
@@ -217,7 +238,9 @@ qgs.exit()
 # read all predictions and save shape file
 print(f'PREDICTIONS COMPLETE')
 
-predictions = glob.glob(f"/lustre/davis/FishPonds_project/share/{RUNS}/test_all_{STATE}_{GRID_NUM}/*/labels/*.npz")
+# predictions = glob.glob(f"{ROOT}/{RUNS}/test_all_{STATE}_{GRID_NUM}/*/labels/*.npz")
+predictions = glob.glob(os.path.join(join_path_project, f"test_all_{STATE}_{GRID_NUM}/*/labels/*.npz"))
+
 if len(predictions):
     name_files = [("_").join(x.split("/")[-1].split(".")[0].split("_")[1:]) for x in predictions]
     # print(name_files)

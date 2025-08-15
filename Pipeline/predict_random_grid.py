@@ -47,9 +47,6 @@ pred_files = parser.add_argument_group()
 
 pred_files.add_argument(
     'STATE',#make list of the 37 nigeria states
-    # choices = ['Anambra', 'Rivers', 'Abia', 'Adamawa', 'AkwaIbom', 'Bauchi', 'Bayelsa', 'Benue', 'Borno', 'CrossRiver', 'Ebonyi', 'Edo', 'Ekiti',
-    #           'Enugu', 'FederalCapitalTerritory', 'Gombe', 'Imo', 'Jigawa', 'Kaduna', 'Katsina', 'Kebbi', 'Kogi', 'Nasarawa',
-    #           'Ondo', 'Osun', 'Plateau', 'Sokoto', 'Taraba', 'Yobe', 'Zamfara', 'Ogun', 'Delta', ],
     choices = ['Abia', 'Adamawa', 'AkwaIbom', 'Anambra', 'Bauchi', 'Bayelsa',
        'Benue', 'Borno', 'CrossRiver', 'Delta', 'Ebonyi', 'Edo', 'Ekiti',
        'Enugu', 'FederalCapitalTerritory', 'Gombe', 'Imo', 'Jigawa',
@@ -89,29 +86,26 @@ STATE = ins.STATE
 # TOTAL_PRED = ins.TOTAL_PRED
 
 DATA_PATH = '/lustre/davis/FishPonds_project/share/final_runs/data'
+ROOT_NIGERIA_DATA='/lustre/davis/FishPonds_project/share/data/'
 
-# if os.access(os.path.join(DATA_PATH, f"{STATE}"), os.W_OK):
-#     STATE = STATE
-# else:
-#     STATE = STATE+'_2'
-# if not os.path.exists(os.path.join(DATA_PATH, f"{STATE}")):
-#     os.makedirs(os.path.join(DATA_PATH, f"{STATE}"))
+ROOT = '/lustre/davis/FishPonds_project/share/'
+
 
 if not os.path.exists(os.path.join(DATA_PATH, f"{STATE}")):
     os.makedirs(os.path.join(DATA_PATH, f"{STATE}"))
     
 
 
-grid = create_grid.create_grid('/lustre/davis/FishPonds_project/share/data', STATE, load=True)
+grid = create_grid.create_grid(ROOT_NIGERIA_DATA, STATE, load=True)
 buffer = gpd.read_file("/lustre/davis/FishPonds_project/share/data/Nigeria/building_buffer/buffer_7_5km_dissolved.shp").to_crs('EPSG:3857')
 grid['area_inter'] = grid.apply(lambda row: row['geometry'].intersection(buffer.loc[0, 'geometry']).area, axis=1)
 grid_state_buffer = grid[grid['area_inter'] >= 200*200*90*3]
 # .index.values
 np.random.seed(434)
 # print(grid)
-grid_random_index = grid_state_buffer.index.values.copy()[:100] #np.arange(len(grid))
+grid_random_index = grid_state_buffer.index.values.copy() #np.arange(len(grid))
 # np.random.shuffle(grid_random_index)
-
+print(f"{STATE} HAS {len(grid_random_index)} ELEMENTS ON GRID")
 # try:
 #     with open('/lustre/davis/FishPonds_project/share/data/Nigeria/grids_ran.json', 'r') as json_file:
 #         grids_ran = json.load(json_file)
@@ -124,7 +118,7 @@ grid_random_index = grid_state_buffer.index.values.copy()[:100] #np.arange(len(g
 
 
 def work(STATE, GRID_NUM, shared_len, lock):
-    command = ['python', 'extract_raster_xyz_google_noqgis_single.py', f'{STATE}', f'{GRID_NUM}', 'final_runs/runs']
+    command = ['python', 'extract_raster_xyz_google_noqgis_single.py', '--STATE', f'{STATE}', '--GRID_NUM', f'{GRID_NUM}', '--RUNS', 'final_runs/runs', '--ROOT', f'{ROOT}', '--ROOT_NIGERIA_DATA', f'{ROOT_NIGERIA_DATA}']
     subprocess.call(command)
     with lock:
         if len(glob.glob(os.path.join(DATA_PATH, f"{STATE}/{GRID_NUM}/geocoords/*_geocoords.shp"))):
@@ -149,23 +143,26 @@ def worker(args):
 
 def process_predictions(DATA_PATH, STATE, path_to_results='', path_to_save=''):
     print("Inspect overlapping, creating data set")
-    # path_to_intersection = intersect_result.intersect_results(DATA_PATH, STATE, path_to_results='', path_to_save='')
+    path_to_intersection = intersect_result.intersect_results(DATA_PATH, STATE, path_to_results='', path_to_save='')
     print("Extract Features")
     print("Extract RGB")
-    # dest_state_intersection = create_features_filter_model.extract_rgb(path_to_intersection)
-    path_to_intersection = '/lustre/davis/FishPonds_project/share/final_runs/data/Sokoto/Sokoto_inter_all_geocoords.shp'
+    ## dest_state_intersection = create_features_filter_model.extract_rgb(path_to_intersection)
+    # path_to_intersection = '/lustre/davis/FishPonds_project/share/final_runs/data/Sokoto/Sokoto_inter_all_geocoords.shp'
     command = ['python', 'extract_rgb.py', f'{STATE}', f'{path_to_intersection}']
     subprocess.call(command)
     path_to_savergb = path_to_intersection.replace(".shp", "_wrgb.shp")
     print("Extract indices")
     # dest_state_intersection_wfeatures, state_geometry = create_features_filter_model.extract_indices(path_to_savergb, STATE)
     conda_env_name = '/lustre/davis/sw/FishPonds/conda_qgis_2025/20250606/'
-    command = f"conda run -p {conda_env_name} python create_features_filter_model.py {STATE} {path_to_savergb}"
-    subprocess.run(command, shell=True, check=True)
+    command = f"conda run -p {conda_env_name} python create_features_filter_model.py --STATE {STATE} --path_to_savergb {path_to_savergb} --DATA_PATH {DATA_PATH} --ROOT_NIGERIA_DATA {ROOT_NIGERIA_DATA}"
+    subprocess.run(command)
     print("Check preds are within polygon")
     dest_state_intersection_wfeatures_path = os.path.join(DATA_PATH, f"{STATE}/temp_{STATE}_inter_all_geocoords_wfeatures.shp")
+    create_features_filter_model.add_state_indices(DATA_PATH, STATE, dest_state_intersection_wfeatures_path)
+    
     create_features_filter_model.check_preds_within_state(DATA_PATH, STATE, dest_state_intersection_wfeatures_path)
-    os.remove(dest_state_intersection_wfeatures_path)
+    
+    [os.remove(x) for x in glob.glob(os.path.join(DATA_PATH, f"{STATE}/temp_{STATE}_inter_all_geocoords_wfeatures.*"))]
 
 def func_manager(STATE, grid_random_index, num_workers):
     with mp.Manager() as manager:
@@ -224,7 +221,7 @@ def generate_table(STATE, grid_random_index, num_workers):
                 
 def main():
     if ins.continue_grid_search == False:
-        num_workers = 2  # Number of parallel workers
+        num_workers = 8  # Number of parallel workers
         generate_table(STATE, grid_random_index, num_workers)
     else:
         print('you are here reading all shp files per grid')
@@ -234,13 +231,13 @@ def main():
         grid_random_index_n = [x for x in grid_random_index if x not in grids_ran]
         if len(grids_ran) == len(grid_random_index):
             if len(annot):
-                # dest = gpd.GeoDataFrame()
-                # for an in annot:
-                #     datas = gpd.read_file(an)
-                #     dest = pd.concat([dest, datas])
-                # dest = dest.reset_index(drop=True)
-                # dest.to_file(os.path.join(DATA_PATH, f"{STATE}/{STATE}_all_geocoords.shp"))
-                # print(f"Processing complete. Total predictions generated: {dest.shape}")           
+                dest = gpd.GeoDataFrame()
+                for an in annot:
+                    datas = gpd.read_file(an)
+                    dest = pd.concat([dest, datas])
+                dest = dest.reset_index(drop=True)
+                dest.to_file(os.path.join(DATA_PATH, f"{STATE}/{STATE}_all_geocoords.shp"))
+                print(f"Processing complete. Total predictions generated: {dest.shape}")           
                 process_predictions(DATA_PATH, STATE, path_to_results='', path_to_save='')
         else:
             num_workers = 8  # Number of parallel workers

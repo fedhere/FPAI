@@ -99,7 +99,7 @@ if not os.path.exists(os.path.join(DATA_PATH, f"{STATE}")):
 grid = create_grid.create_grid(ROOT_NIGERIA_DATA, STATE, load=True)
 buffer = gpd.read_file("/lustre/davis/FishPonds_project/share/data/Nigeria/building_buffer/buffer_7_5km_dissolved.shp").to_crs('EPSG:3857')
 grid['area_inter'] = grid.apply(lambda row: row['geometry'].intersection(buffer.loc[0, 'geometry']).area, axis=1)
-grid_state_buffer = grid[grid['area_inter'] >= 200*200*90*3]
+grid_state_buffer = grid[grid['area_inter'] >= 200*200*90*5]
 # .index.values
 np.random.seed(434)
 # print(grid)
@@ -141,23 +141,22 @@ def worker(args):
     return work(*args)
 
 
-def process_predictions(DATA_PATH, STATE, path_to_results='', path_to_save=''):
+def process_predictions(DATA_PATH, STATE, path_to_results='', path_to_save=''): # this has to be another job, to activate conda env conda_env_name = '/lustre/davis/sw/FishPonds/conda_qgis_2025/20250606/'
     print("Inspect overlapping, creating data set")
     path_to_intersection = intersect_result.intersect_results(DATA_PATH, STATE, path_to_results='', path_to_save='')
     print("Extract Features")
     print("Extract RGB")
-    ## dest_state_intersection = create_features_filter_model.extract_rgb(path_to_intersection)
     # path_to_intersection = '/lustre/davis/FishPonds_project/share/final_runs/data/Sokoto/Sokoto_inter_all_geocoords.shp'
-    command = ['python', 'extract_rgb.py', f'{STATE}', f'{path_to_intersection}']
+    command = ['python', 'extract_rgb.py', f'{STATE}', f'{path_to_intersection}'] # this one doesnt work as module
     subprocess.call(command)
     path_to_savergb = path_to_intersection.replace(".shp", "_wrgb.shp")
     print("Extract indices")
-    # dest_state_intersection_wfeatures, state_geometry = create_features_filter_model.extract_indices(path_to_savergb, STATE)
-    conda_env_name = '/lustre/davis/sw/FishPonds/conda_qgis_2025/20250606/'
-    command = f"conda run -p {conda_env_name} python create_features_filter_model.py --STATE {STATE} --path_to_savergb {path_to_savergb} --DATA_PATH {DATA_PATH} --ROOT_NIGERIA_DATA {ROOT_NIGERIA_DATA}"
-    subprocess.run(command)
+    # conda_env_name = '/lustre/davis/sw/FishPonds/conda_qgis_2025/20250606/'
+    # command = f"conda run -p {conda_env_name} python create_features_filter_model.py --STATE {STATE} --path_to_savergb {path_to_savergb} --DATA_PATH {DATA_PATH} --ROOT_NIGERIA_DATA {ROOT_NIGERIA_DATA}"
+    # subprocess.run(command)
+    create_features_filter_model.extract_indices(DATA_PATH, path_to_savergb, STATE, ROOT_NIGERIA_DATA)
     print("Check preds are within polygon")
-    dest_state_intersection_wfeatures_path = os.path.join(DATA_PATH, f"{STATE}/temp_{STATE}_inter_all_geocoords_wfeatures.shp")
+    dest_state_intersection_wfeatures_path = os.path.join(DATA_PATH, f"{STATE}/temp_inter_all_geocoords_wfeatures_v2.shp")
     create_features_filter_model.add_state_indices(DATA_PATH, STATE, dest_state_intersection_wfeatures_path)
     
     create_features_filter_model.check_preds_within_state(DATA_PATH, STATE, dest_state_intersection_wfeatures_path)
@@ -183,7 +182,7 @@ def func_manager(STATE, grid_random_index, num_workers):
     if ins.continue_grid_search == False:
         if len(glob.glob(os.path.join(DATA_PATH, f"{STATE}/{STATE}_all_geocoords.shp"))):
             print(f"Processing complete, predictions needed found. Total predictions generated: {results}")
-            process_predictions(DATA_PATH, STATE, path_to_results='', path_to_save='')
+            # process_predictions(DATA_PATH, STATE, path_to_results='', path_to_save='')
         else:
             annot = glob.glob(os.path.join(DATA_PATH, f"{STATE}/*/geocoords/*_geocoords.shp"))
             if len(annot):
@@ -195,7 +194,7 @@ def func_manager(STATE, grid_random_index, num_workers):
                 dest.to_file(os.path.join(DATA_PATH, f"{STATE}/{STATE}_all_geocoords.shp"))
                 # print(f"Processing complete. Total predictions generated: {results}, {dest.shape} and total pred expected {TOTAL_PRED}")
                 print(f"Processing complete. Total predictions generated: {results}, {dest.shape}")           
-                process_predictions(DATA_PATH, STATE, path_to_results='', path_to_save='')
+                # process_predictions(DATA_PATH, STATE, path_to_results='', path_to_save='')
             
     else:
         annot = glob.glob(os.path.join(DATA_PATH, f"{STATE}/*/geocoords/*_geocoords.shp"))
@@ -208,7 +207,7 @@ def func_manager(STATE, grid_random_index, num_workers):
             dest.to_file(os.path.join(DATA_PATH, f"{STATE}/{STATE}_all_geocoords.shp"))
             # print(f"Processing complete. Total predictions generated: {results}, {dest.shape} and total pred expected {TOTAL_PRED}")
             print(f"Processing complete. Total predictions generated: {results}, {dest.shape}")           
-            process_predictions(DATA_PATH, STATE, path_to_results='', path_to_save='')
+            # process_predictions(DATA_PATH, STATE, path_to_results='', path_to_save='')
             
         else:
             dest = gpd.GeoDataFrame({'ids':[0], 'geometry': ['nothing here']})
@@ -221,7 +220,7 @@ def generate_table(STATE, grid_random_index, num_workers):
                 
 def main():
     if ins.continue_grid_search == False:
-        num_workers = 8  # Number of parallel workers
+        num_workers = 32  # Number of parallel workers
         generate_table(STATE, grid_random_index, num_workers)
     else:
         print('you are here reading all shp files per grid')
@@ -238,9 +237,9 @@ def main():
                 dest = dest.reset_index(drop=True)
                 dest.to_file(os.path.join(DATA_PATH, f"{STATE}/{STATE}_all_geocoords.shp"))
                 print(f"Processing complete. Total predictions generated: {dest.shape}")           
-                process_predictions(DATA_PATH, STATE, path_to_results='', path_to_save='')
+                # process_predictions(DATA_PATH, STATE, path_to_results='', path_to_save='')
         else:
-            num_workers = 8  # Number of parallel workers
+            num_workers = 32  # Number of parallel workers
             generate_table(STATE, grid_random_index_n, num_workers)
 
 

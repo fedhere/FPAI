@@ -17,8 +17,8 @@ import utils_mask_to_pixels
 import create_grid
 import save_predictions
 import subprocess
-
-
+import pandas as pd
+import shutil
 import argparse
 from argparse import FileType, ArgumentParser
 
@@ -34,9 +34,12 @@ pred_files = parser.add_argument_group()
 
 pred_files.add_argument(
     '--STATE',#make list of the 37 nigeria states
-    choices = ['Anambra', 'Rivers', 'Abia', 'Adamawa', 'AkwaIbom', 'Bauchi', 'Bayelsa', 'Benue', 'Borno', 'CrossRiver', 'Ebonyi', 'Edo', 'Ekiti',
-              'Enugu', 'FederalCapitalTerritory', 'Gombe', 'Imo', 'Jigawa', 'Kaduna', 'Katsina', 'Kebbi', 'Kogi', 'Nasarawa',
-              'Ondo', 'Osun', 'Plateau', 'Sokoto', 'Taraba', 'Yobe', 'Zamfara'],
+    choices = ['Abia', 'Adamawa', 'AkwaIbom', 'Anambra', 'Bauchi', 'Bayelsa',
+       'Benue', 'Borno', 'CrossRiver', 'Delta', 'Ebonyi', 'Edo', 'Ekiti',
+       'Enugu', 'FederalCapitalTerritory', 'Gombe', 'Imo', 'Jigawa',
+       'Kaduna', 'Kano', 'Katsina', 'Kebbi', 'Kogi', 'Kwara', 'Lagos',
+       'Nasarawa', 'Niger', 'Ogun', 'Ondo', 'Osun', 'Oyo', 'Plateau',
+       'Rivers', 'Sokoto', 'Taraba', 'Yobe', 'Zamfara'],
     metavar='STATE',
     help='Define state where you want to extract imgs ',
     type=str)
@@ -102,7 +105,7 @@ create_grid.create_grid(ROOT_NIGERIA_DATA, STATE, GRID_NUM)
 
 # Load QGIS to extract Google XYZ Tiles
 os.environ["QT_QPA_PLATFORM"] = "offscreen"
-
+QgsApplication.setPrefixPath("/lustre/davis/sw/FishPonds/yolov7_qgis_2025/20250124/share/qgis/python/qgis", True)
 qgs = QgsApplication([], False)
 # Load providers
 qgs.initQgis()
@@ -176,56 +179,74 @@ xmin = xmax - sx
 
 join_path_project = os.path.join(ROOT, RUNS)
 
-
+if os.path.exists(f"{join_path_project}/test_all_{STATE}_{GRID_NUM}/test_all_{STATE}_{GRID_NUM}.csv"):
+    df_paths = pd.read_csv(f"{join_path_project}/test_all_{STATE}_{GRID_NUM}/test_all_{STATE}_{GRID_NUM}.csv")
+    df_paths_vals = df_paths['paths_inner'].values
+else:
+    df_paths = pd.DataFrame()
+    df_paths['paths_inner'] = ['initial']
+    df_paths_vals = df_paths['paths_inner'].values
 print(f"EXTRACTING TIF FILES FROM XYZ GOOGLE TILES OF {STATE} AND GRID NUM {GRID_NUM}")
 for i in range(iter_w):
     # ymax = extent_big.yMaximum()
     ymax = extent_big.yMaximum() + 2*(overlap*0.1)#extent_big.yMaximum()
     ymin = ymax - sy
     for j in range(iter_h):
-        # if not os.path.exists(f"/lustre/davis/FishPonds_project/share/{RUNS}/test_all_{STATE}_{GRID_NUM}/{STATE}_g{k}c{i}r{j}"):
-        extent = QgsRectangle(xmin, ymin, xmax, ymax)
-        # location to save raster files
-        #file_writer = QgsRasterFileWriter(f'/data/correct_data/delta_11/delta_{k}{i}{j}.tif')
-        file_writer = QgsRasterFileWriter(os.path.join(DATA_PATH, f'{STATE}/{GRID_NUM}/{STATE}_g{k}c{i}r{j}.tif'))
-        file_writer.writeRaster(pipe,
-                            width,
-                            height,
-                            extent,
-                            rlayer.crs())
-        img = os.path.join(DATA_PATH, f'{STATE}/{GRID_NUM}/{STATE}_g{k}c{i}r{j}.tif')
-        with rasterio.open(img) as src:
-            raster_transform = src.transform
-            # print(raster_transform)
-    
-        with open(os.path.join(loc_save_transform, f"{STATE}_g{k}c{i}r{j}_transform.txt"), "w") as f:
-            f.write(str(raster_transform[0:])[1:-1] + '\n')
-            f.write(str(src.crs))
+        valu_use =  f"{join_path_project}/test_all_{STATE}_{GRID_NUM}/{STATE}_g{k}c{i}r{j}"
+        if valu_use in df_paths_vals:
+            print('already run')
+        # if os.path.exists(f"{join_path_project}/test_all_{STATE}_{GRID_NUM}/{STATE}_g{k}c{i}r{j}"):
+        #     print(f"{join_path_project}/test_all_{STATE}_{GRID_NUM}/{STATE}_g{k}c{i}r{j} exists" )
+        else:
+            extent = QgsRectangle(xmin, ymin, xmax, ymax)
+            # location to save raster files
+            #file_writer = QgsRasterFileWriter(f'/data/correct_data/delta_11/delta_{k}{i}{j}.tif')
+            file_writer = QgsRasterFileWriter(os.path.join(DATA_PATH, f'{STATE}/{GRID_NUM}/{STATE}_g{k}c{i}r{j}.tif'))
+            file_writer.writeRaster(pipe,
+                                width,
+                                height,
+                                extent,
+                                rlayer.crs())
+            img = os.path.join(DATA_PATH, f'{STATE}/{GRID_NUM}/{STATE}_g{k}c{i}r{j}.tif')
+            with rasterio.open(img) as src:
+                raster_transform = src.transform
+                # print(raster_transform)
         
-        filename_new = img.replace('.tif', '.png')
-        with Image.open(img) as tif:
-            tif.save(filename_new)
-        os.remove(img)
+            with open(os.path.join(loc_save_transform, f"{STATE}_g{k}c{i}r{j}_transform.txt"), "w") as f:
+                f.write(str(raster_transform[0:])[1:-1] + '\n')
+                f.write(str(src.crs))
+            
+            filename_new = img.replace('.tif', '.png')
+            with Image.open(img) as tif:
+                tif.save(filename_new)
+            os.remove(img)
+    
+            if os.path.exists(f"{join_path_project}/test_all_{STATE}_{GRID_NUM}/{STATE}_g{k}c{i}r{j}"):
+                command = ['rm', '-r', f"{join_path_project}/test_all_{STATE}_{GRID_NUM}/{STATE}_g{k}c{i}r{j}"]
+                subprocess.call(command)
+    
+            comand = (f"python $WORKDIR/FishPonds_project/share/YOLO/yolov7/seg/segment/predict.py \
+            --imgsz 1600 \
+            --source {os.path.join(DATA_PATH, f'{STATE}/{GRID_NUM}/{STATE}_g{k}c{i}r{j}.png')} \
+            --weights $WORKDIR/FishPonds_project/share/YOLO/yolov7/seg/runs/train-seg/{MODEL_NAME}/weights/best.pt \
+            --save-txt \
+            --save-conf \
+            --iou-thres 0.5 \
+            --conf-thres 0.5 \
+            --project {join_path_project}/test_all_{STATE}_{GRID_NUM}/ \
+            --name {STATE}_g{k}c{i}r{j}")
+            os.system(comand)
+            os.remove(os.path.join(DATA_PATH, f'{STATE}/{GRID_NUM}/{STATE}_g{k}c{i}r{j}.png'))
+            df_new = pd.DataFrame()
+            df_new['paths_inner'] = [valu_use]
+            df_paths = pd.concat([df_paths, df_new]).reset_index(drop=True)
+            df_paths.to_csv(f"{join_path_project}/test_all_{STATE}_{GRID_NUM}/test_all_{STATE}_{GRID_NUM}.csv", index=False)
+    
+    
+            save_predictions.save_predictions(RUNS, STATE, GRID_NUM, k, i, j)
 
-        if os.path.exists(f"{join_path_project}/test_all_{STATE}_{GRID_NUM}/{STATE}_g{k}c{i}r{j}"):
-            command = ['rm', '-r', f"{join_path_project}/test_all_{STATE}_{GRID_NUM}/{STATE}_g{k}c{i}r{j}"]
-            subprocess.call(command)
-
-        comand = (f"python $WORKDIR/FishPonds_project/share/YOLO/yolov7/seg/segment/predict.py \
-        --imgsz 1600 \
-        --source {os.path.join(DATA_PATH, f'{STATE}/{GRID_NUM}/{STATE}_g{k}c{i}r{j}.png')} \
-        --weights $WORKDIR/FishPonds_project/share/YOLO/yolov7/seg/runs/train-seg/{MODEL_NAME}/weights/best.pt \
-        --save-txt \
-        --save-conf \
-        --iou-thres 0.5 \
-        --conf-thres 0.5 \
-        --project {join_path_project}/test_all_{STATE}_{GRID_NUM}/ \
-        --name {STATE}_g{k}c{i}r{j}")
-        os.system(comand)
-        os.remove(os.path.join(DATA_PATH, f'{STATE}/{GRID_NUM}/{STATE}_g{k}c{i}r{j}.png'))
-
-
-        save_predictions.save_predictions(RUNS, STATE, GRID_NUM, k, i, j)
+            df_paths = pd.read_csv(f"{join_path_project}/test_all_{STATE}_{GRID_NUM}/test_all_{STATE}_{GRID_NUM}.csv")
+            df_paths_vals = df_paths['paths_inner'].values
       
         ymax = ymin + (overlap*0.1)
         ymin = ymax - sy
@@ -254,8 +275,13 @@ if len(predictions):
     print(f"test_all_{STATE}_{GRID_NUM} predictions saved as shapefile")
 else:
     dest = gpd.GeoDataFrame({'ids':[0], 'geometry': ['nothing here']})
-    dest.to_file(os.path.join(save_loc_coord, f"{STATE}_{GRID_NUM}_{P}_geocoords.shp"))
+    dest.to_file(os.path.join(save_loc_coord, f"{STATE}_{GRID_NUM}_P_geocoords.shp"))
 os.system(f"rm -r {loc_save_transform}")
-# return# True
-        
-    # print(f"DONE for {STATE} GRID NUMBER {GRID_NUM}")
+df_paths = pd.read_csv(f"{join_path_project}/test_all_{STATE}_{GRID_NUM}/test_all_{STATE}_{GRID_NUM}.csv")['paths_inner'].values
+for ppi in df_paths:
+    try:
+        print(f'here you delete {ppi}')
+        shutil.rmtree(ppi)
+    except OSError as e:
+        print("Error: %s - %s." % (e.filename, e.strerror))
+

@@ -20,7 +20,10 @@ def save_predictions(RUNS, STATE, GRID_NUM, k, i, j):
         print(f"test_all_{STATE}_{GRID_NUM}/{STATE}_g{k}c{i}r{j} does not have predictions")
         print(os.path.exists(f"/lustre/davis/FishPonds_project/share/{RUNS}/test_all_{STATE}_{GRID_NUM}/{STATE}_g{k}c{i}r{j}/*.png"))
         print(path_to_imgs)
-        os.remove(path_to_imgs[0])
+        try:
+            os.remove(path_to_imgs[0])
+        except:
+            print("no remove?")
     else:
         p_pred = []
         img = cv2.imread(path_to_imgs[0])
@@ -40,7 +43,10 @@ def save_predictions(RUNS, STATE, GRID_NUM, k, i, j):
                     sizes_len.append(len(mask_to_polygon[ixs]))
                     mask_to_polygons_list.append(mask_to_polygon[np.argmax(np.array(sizes_len))])
             else:
-                mask_to_polygons_list.append(mask_to_polygon[0])
+                try:
+                    mask_to_polygons_list.append(mask_to_polygon[0])
+                except:
+                    pass
     
         for imt in range(mask_test.shape[0]):
             points = [[mask_to_polygons_list[imt][ixs, 0].item(), mask_to_polygons_list[imt][ixs, 1].item()] for ixs in range(len(mask_to_polygons_list[imt]))] 

@@ -13,6 +13,8 @@ import glob
 def create_grid(DATA_PATH, STATE, GRID_NUM=0, load=False):
     print(f'CREATING GRID FOR {STATE}')
     if not os.path.exists(os.path.join(DATA_PATH, f"{STATE}/grid_{STATE}.shp")):
+        if not os.path.exists(os.path.join(DATA_PATH, f"{STATE}")):
+            os.makedirs(os.path.join(DATA_PATH, f"{STATE}"), exist_ok=False)
         nigeria_all = gpd.read_file(os.path.join(DATA_PATH, "Nigeria/ngaadmbndaadm1osgof/nga_admbnda_adm1_osgof_20161215.shp")).to_crs('EPSG:3857')
         nigeria_all['admin1Name'] = nigeria_all['admin1Name'].apply(lambda x: x.replace(" ", ""))
         state_geometry = nigeria_all[nigeria_all['admin1Name'] == STATE]

@@ -1,22 +1,21 @@
 #!/bin/bash
 #SBATCH --partition=standard
 #SBATCH --mem=100G
-#SBATCH --cpus-per-task=32
-#SBATCH --time=7-0
-#SBATCH --output=cpu_random_pred_yolov7_%x-%j.out
-#SBATCH --error=real_error_%x-%j.log
+#SBATCH --cpus-per-task=4
+#SBATCH --time=2-0
+#SBATCH --output=feat_rf_pred_%x-%j.out
+#SBATCH --error=real_error_feat_rf_pred_%x-%j.log
 
 vpkg_require anaconda/2024.02
 source activate base
-conda activate /lustre/davis/sw/FishPonds/yolov7_qgis_2025/20250124
-export PYTORCH_CUDA_ALLOC_CONF=max_split_size_mb:128
+conda activate /lustre/davis/sw/FishPonds/conda_qgis_2025/20250606/
 export XDG_RUNTIME_DIR="/tmp/runtime-taceroc"
 export XDG_CACHE_HOME="${TMPDIR:-/tmp}"
+
 #echo "this is a test job names" $SLURM_JOB_NAME
 ## WEIGHT_PATH = $WORKDIR/yolov7/seg/yolov7-seg.pt
 srun python $*
-# sbatch -J STATE pred_all_state_random.sh predict_random_grid.py STATE TOTAL_PRED --continue_grid_search
-
+# sbatch -J Bayelsa pred_all_state_features_rf.sh extract_all_features_rf.py Bayelsa
 
 
 

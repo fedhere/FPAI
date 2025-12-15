@@ -89,15 +89,16 @@ Figure: Distribution of annotated Fish Pond area in m2 across all the states con
 |area| area of the prediction in meters| segmentation model prediction|
 |length| perimeter of the prediction in meters| " " |
 |isoperimetric ratio | how round is the prediction, 1 for circle | " "|
-|NDVI\_pond[^1]/state[^2]/1km[^3] |  Normalized Difference Vegetation Index| Sentinel-2, Level-2A, GEE[^4]/ Python API |
-|NDBI\_pond/state/1km |  Normalized Difference Built-up Index|" " |
-|NDWI\_pond/state/1km |  Normalized Difference Water Index| " " |
-|MSAVI\_pond/state/1km | Modified Soil Adjusted Vegetation Index|" " |
+|NDVI\_pond[^1]/state[^2]/1km[^3]/01[^4] |  Normalized Difference Vegetation Index| Sentinel-2, Level-2A, GEE[^5]/ Python API |
+|NDBI\_pond/state/1km/01 |  Normalized Difference Built-up Index|" " |
+|NDWI\_pond/state/1km/01 |  Normalized Difference Water Index| " " |
+|MSAVI\_pond/state/1km/01 | Modified Soil Adjusted Vegetation Index|" " |
 
-[^1]: for the area of the prediction
-[^2]: for the state where the prediction is located
-[^3]: 1km$^{2}$ around the prediction
-[^4]: Google Earth Engine. Sentinel data was extracted from the period between November and December 2023.
+[^1]: for the area of the prediction in December 2023
+[^2]: for the state where the prediction is located in December 2023
+[^3]: 1km$^{2}$ around the prediction in December 2023
+[^4]: 1km$^{2}$ around the prediction in January 2024
+[^5]: Google Earth Engine. Sentinel data was extracted from the period between November and December 2023.
 
 
 

@@ -40,9 +40,20 @@
      * sbatch -J STATE pred_all_state_random.sh predict_random_grid.py STATE \
        If the job ended but not all state was covered, submit this job instead \
      * sbatch -J STATE pred_all_state_random.sh predict_random_grid.py STATE --continue_grid_search
-       
-     (1)NOTE: States with two or more words should be written without the space, e.g: Cross River should be written as CrossRiver
-  8. Results would be on `Pipeline/data/STATE/STATE_all_geocoords.*`
+       To predict over all grids (all state): \
+     * sbatch -J STATE pred_all_state_random.sh predict_random_grid.py STATE --continue_grid_search --how_to_use True
+       To predict over all grids (all state) but select a batch of 200 grids: \
+     * sbatch -J STATE pred_all_state_random.sh predict_random_grid.py STATE --continue_grid_search --how_to_use none --batch_num a_number_between_0_and_total_num_batches 
+       Once the state or the desired grids are covered generate the final predicitions shap file: \
+     * sbatch -J STATE pred_all_state_random.sh predict_random_grid.py STATE --generate
+       Results would be on `Pipeline/data/STATE/STATE_all_geocoords.*`
+  8. Once the prediction file is generated, it's time to extract the features for the random forest\
+      sbatch -J STATE pred_all_state_features_rf.sh extract_all_features_rf.py STATE
+      Results with all features would be on `Pipeline/data/STATE/STATE_inter_all_geocoords_time_series.*`.\
+      There will also be intermediate files saved.\
+  9. The same command will generate the final Random Forest prediction. Results would be on `Pipeline/data/STATE/STATE_inter_all_geocoords_time_series_wpred.*`\
+
+(1)NOTE: States with two or more words should be written without the space, e.g: Cross River should be written as CrossRiver
 
 # How data was collected?: Fish Pond Census
 

@@ -34,24 +34,25 @@
     
   3. Git clone https://github.com/taceroc/yolov7/tree/u7_tac_loss_gpu
   4. Download shape file of Nigeria division by states and save to data/Nigeria
-  5. Download model 'fine_tune_ogun_delta_combine_freeze_v2' (feb 17/2025: google drive FishPonds)
-  6. cd to Pipeline/
-  7. Run pipeline by, replace STATE by your desired state, as listed in the shape file of Nigeria(1)
-     * sbatch -J STATE pred_all_state_random.sh predict_random_grid.py STATE \
-       If the job ended but not all state was covered, submit this job instead \
+  5. Download model 'fine_tune_ogun_delta_combine_freeze_v2' (zenodo)
+  6. Download random forest model 'fishpond_rf_model_state_cluster15_ndvi_ts_wmore' (zenodo)
+  7. cd to Pipeline/
+  8. Run pipeline by, replace STATE by your desired state, as listed in the shape file of Nigeria(1)
+     * sbatch -J STATE pred_all_state_random.sh predict_random_grid.py STATE 
+       If the job ended but not all state was covered, submit this job instead:
      * sbatch -J STATE pred_all_state_random.sh predict_random_grid.py STATE --continue_grid_search
        To predict over all grids (all state): \
      * sbatch -J STATE pred_all_state_random.sh predict_random_grid.py STATE --continue_grid_search --how_to_use True
-       To predict over all grids (all state) but select a batch of 200 grids: \
+       To predict over all grids (all state) but select a batch of 200 grids: 
      * sbatch -J STATE pred_all_state_random.sh predict_random_grid.py STATE --continue_grid_search --how_to_use none --batch_num a_number_between_0_and_total_num_batches \
-       Once the state or the desired grids are covered generate the final predicitions shap file: \
+       Once the state or the desired grids are covered generate the final predicitions shap file: 
      * sbatch -J STATE pred_all_state_random.sh predict_random_grid.py STATE --generate \
        Results would be on `Pipeline/data/STATE/STATE_all_geocoords.*`
-  8. Once the prediction file is generated, it's time to extract the features for the random forest\
+  9. Once the prediction file is generated, it's time to extract the features for the random forest\
       sbatch -J STATE pred_all_state_features_rf.sh extract_all_features_rf.py STATE
       Results with all features would be on `Pipeline/data/STATE/STATE_inter_all_geocoords_time_series.*`.\
       There will also be intermediate files saved.\
-  9. The same command will generate the final Random Forest prediction. Results would be on `Pipeline/data/STATE/STATE_inter_all_geocoords_time_series_wpred.*`\
+  10. The same command will generate the final Random Forest prediction. Results would be on `Pipeline/data/STATE/STATE_inter_all_geocoords_time_series_wpred.*`\
 
 (1)NOTE: States with two or more words should be written without the space, e.g: Cross River should be written as CrossRiver
 

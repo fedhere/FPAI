@@ -278,7 +278,7 @@ else:
     dest.to_file(os.path.join(save_loc_coord, f"{STATE}_{GRID_NUM}_P_geocoords.shp"))
 os.system(f"rm -r {loc_save_transform}")
 df_paths = pd.read_csv(f"{join_path_project}/test_all_{STATE}_{GRID_NUM}/test_all_{STATE}_{GRID_NUM}.csv")['paths_inner'].values
-for ppi in df_paths:
+for ppi in df_paths[:-2]:
     try:
         print(f'here you delete {ppi}')
         shutil.rmtree(ppi)

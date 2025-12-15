@@ -2,6 +2,7 @@
 import create_grid
 import intersect_result
 import create_features_filter_model
+import create_features_filter_model_time_series
 import apply_RF_model
 import argparse
 from argparse import FileType, ArgumentParser
@@ -97,7 +98,7 @@ print(f"{STATE} HAS {len(grid_random_index)} ELEMENTS ON GRID")
 
 
 def process_predictions(DATA_PATH, STATE, path_to_results='', path_to_save=''): # this has to be another job, to activate conda env conda_env_name = '/lustre/davis/sw/FishPonds/conda_qgis_2025/20250606/'
-    path_to_save_final = os.path.join(DATA_PATH, f"{STATE}/{STATE}_inter_all_geocoords_wfeatures.shp")
+    path_to_save_final = os.path.join(DATA_PATH, f"{STATE}/{STATE}_inter_all_geocoords_time_series.shp")
     if os.path.exists(path_to_save_final):
         print('ALL DONE')
     else:
@@ -133,14 +134,36 @@ def process_predictions(DATA_PATH, STATE, path_to_results='', path_to_save=''): 
         else:
             create_features_filter_model.add_state_indices(DATA_PATH, STATE, dest_state_intersection_wfeatures_path)
             create_features_filter_model.check_preds_within_state(DATA_PATH, STATE, dest_state_intersection_wfeatures_path)
+        print('Start cleaning')
+        path_to_save_clean = os.path.join(DATA_PATH, f"{STATE}/{STATE}_inter_all_geocoords_clean.shp")
+        if os.path.exists(path_to_save_clean):
+            print('clean done')
+        else:
+            #Find polygons that are at least 70% within another polygon
+            partial_results = create_features_filter_model_time_series.find_partial_overlaps(DATA_PATH, path_to_save_final, STATE, min_overlap_ratio=0.7, keep_largest=True)
+            print(f"Found {len(partial_results)} partial containment relationships")
+        print('Start cluster')    
+        path_to_save_wcluster = os.path.join(DATA_PATH, f"{STATE}/{STATE}_inter_all_geocoords_wcluster_size.shp")
+        if os.path.exists(path_to_save_wcluster):
+            print('cluster done')
+        else:
+            create_features_filter_model_time_series.create_buffer_groups(15, DATA_PATH, path_to_save_clean, STATE)
+        print('Start january indices') 
+        path_to_save_wjan = os.path.join(DATA_PATH, f"{STATE}/{STATE}_inter_all_geocoords_time_series.shp")
+        if os.path.exists(path_to_save_wjan):
+            print('jan indices done')
+        else:
+            create_features_filter_model_time_series.extract_indices(DATA_PATH, path_to_save_wcluster, STATE, ROOT_NIGERIA_DATA)
+
+            
     
     # [os.remove(x) for x in glob.glob(os.path.join(DATA_PATH, f"{STATE}/temp_{STATE}_inter_all_geocoords_wfeatures.*"))]
 
                 
 def main():
     process_predictions(DATA_PATH, STATE, path_to_results='', path_to_save='')
-    seg_predictions_path = os.path.join(DATA_PATH, f"{STATE}/{STATE}_inter_all_geocoords_wfeatures.shp")
-    apply_RF_model.apply_rf(seg_predictions_path=seg_predictions_path, use_state=None, path_to_rf_model='')
+    seg_predictions_path = os.path.join(DATA_PATH, f"{STATE}/{STATE}_inter_all_geocoords_time_series.shp")
+    apply_RF_model.apply_rf_jan_cluster(seg_predictions_path=seg_predictions_path, path_to_rf_model='')
 
 
 if __name__ == "__main__":

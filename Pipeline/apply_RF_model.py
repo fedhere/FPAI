@@ -34,14 +34,11 @@ def apply_rf(seg_predictions_path='', use_state=None, path_to_rf_model=''):
         else:
             model_name = "Tatiana/fishpond_rf_model_no_index_states"
             seg_predictions.loc[:, f'pred_wostate'] = load_apply_model(model_name, seg_predictions)
-
-    # loaded_rf = joblib.load(path_to_rf_model)
-    # seg_predictions = gpd.read_file(seg_predictions_path)
-    
-    # X = seg_predictions[rf2.feature_names_in_]
-    
-    # seg_predictions.loc[:, f'pred_wstate{use_state}'] = loaded_rf.predict(X)
-    
-    # path_to_save = os.path.join(DATA_PATH, f"{STATE}/{STATE}_inter_all_geocoords_wpred.shp")
     
     seg_predictions.to_file(seg_predictions_path.replace('_wfeatures', '_wpred'))
+
+def apply_rf_jan_cluster(seg_predictions_path='', path_to_rf_model=''):
+    seg_predictions = gpd.read_file(seg_predictions_path)
+    model_name = "Tatiana/fishpond_rf_model_state_cluster15_ndvi_ts_wmore"
+    seg_predictions.loc[:, f'pred'] = load_apply_model(model_name, seg_predictions)
+    seg_predictions.to_file(seg_predictions_path.replace('_time_series', '_time_series_wpred'))

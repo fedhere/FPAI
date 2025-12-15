@@ -43,9 +43,9 @@
        To predict over all grids (all state): \
      * sbatch -J STATE pred_all_state_random.sh predict_random_grid.py STATE --continue_grid_search --how_to_use True
        To predict over all grids (all state) but select a batch of 200 grids: \
-     * sbatch -J STATE pred_all_state_random.sh predict_random_grid.py STATE --continue_grid_search --how_to_use none --batch_num a_number_between_0_and_total_num_batches 
+     * sbatch -J STATE pred_all_state_random.sh predict_random_grid.py STATE --continue_grid_search --how_to_use none --batch_num a_number_between_0_and_total_num_batches \
        Once the state or the desired grids are covered generate the final predicitions shap file: \
-     * sbatch -J STATE pred_all_state_random.sh predict_random_grid.py STATE --generate
+     * sbatch -J STATE pred_all_state_random.sh predict_random_grid.py STATE --generate \
        Results would be on `Pipeline/data/STATE/STATE_all_geocoords.*`
   8. Once the prediction file is generated, it's time to extract the features for the random forest\
       sbatch -J STATE pred_all_state_features_rf.sh extract_all_features_rf.py STATE
